@@ -17,7 +17,7 @@ function App() {
     useEffect(() => {
         let active = true;
         // Session restoration must never make the public storefront depend on
-        // an available API connection. A cold EC2/proxy or a CORS outage
+        // an available API connection. A slow API proxy or a CORS outage
         // should show the public app after a short bounded wait.
         client.get("auth/session/", {
             skipAuthRefresh: true,
