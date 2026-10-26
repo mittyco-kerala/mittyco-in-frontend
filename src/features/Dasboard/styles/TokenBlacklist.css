@@ -1,0 +1,20 @@
+.token-blacklist-page .admin-table { min-width: 980px; }
+.token-blacklist-scroll-hint { display: none; margin: 0; padding: 9px 14px; border-bottom: 1px solid var(--admin-line); background: #fff8ed; color: #76634a; font-size: 12px; line-height: 1.4; }
+.token-blacklist-action { min-width: max-content; min-height: 36px; padding: 7px 10px; font-size: 12px; white-space: nowrap; }
+
+@media (max-width: 700px) {
+  .token-blacklist-page .admin-page-header { align-items: stretch; }
+  .token-blacklist-page .admin-filters { align-items: stretch; }
+  .token-blacklist-page .admin-filter-fields,
+  .token-blacklist-page .admin-search { width: 100%; max-width: none; }
+  .token-blacklist-page .admin-filters > .admin-button { width: 100%; }
+  .token-blacklist-scroll-hint { display: block; }
+  .token-blacklist-page .admin-table-wrap { overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+  .token-blacklist-page .admin-table { min-width: 900px; }
+  .token-blacklist-page .admin-table th,
+  .token-blacklist-page .admin-table td { padding: 12px 10px; font-size: 11px; }
+  .token-blacklist-page .admin-table th:first-child,
+  .token-blacklist-page .admin-table td:first-child { position: sticky; left: 0; z-index: 2; background: #fff; box-shadow: 5px 0 10px rgba(38, 64, 72, .06); }
+  .token-blacklist-page .admin-table th:first-child { z-index: 3; background: #fbfcfb; }
+  .token-blacklist-page .token-blacklist-action { min-height: 40px; }
+}

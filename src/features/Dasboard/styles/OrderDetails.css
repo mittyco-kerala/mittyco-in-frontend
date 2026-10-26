@@ -1,0 +1,602 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#fdf8fa;
+    font-family:"Poppins",sans-serif;
+    color:#1F5B3E;
+}
+
+.admin-order-page{
+    max-width:1400px;
+    margin:40px auto;
+    padding:0 20px;
+}
+
+.admin-order-loading{
+    height:350px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:24px;
+    font-weight:600;
+    color:#8B1E3F;
+}
+
+.admin-order-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:35px;
+    padding:28px 35px;
+    background:linear-gradient(135deg,#FBFAF4,#fff7f9);
+    border-radius:18px;
+    border:1px solid #f2d9e1;
+    box-shadow:0 8px 25px rgba(139,30,63,.12);
+}
+
+.admin-order-header h2{
+    font-size:34px;
+    font-weight:700;
+    color:#8B1E3F;
+}
+
+.admin-order-header p{
+    margin-top:8px;
+    color: #77907F;
+    font-size:15px;
+}
+
+.admin-order-actions{
+    display:flex;
+    gap:15px;
+}
+
+.admin-back-btn{
+    padding:12px 22px;
+    border:none;
+    border-radius:10px;
+    background:#efe7ea;
+    color:#8B1E3F;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.admin-back-btn:hover{
+    background:#e7d6dc;
+}
+
+.admin-print-btn{
+    padding:13px 28px;
+    border:none;
+    border-radius:10px;
+    background:linear-gradient(135deg,#d84c72,#8B1E3F);
+    color: #FFFFFF;
+    font-weight:600;
+    cursor:pointer;
+    transition:.35s;
+}
+
+.admin-print-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 20px rgba(139,30,63,.25);
+}
+
+.admin-order-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:25px;
+    margin-bottom:30px;
+}
+.admin-order-card{
+    background: #FBFAF4;
+    border:1px solid #f1d7df;
+    border-radius:18px;
+    padding:28px;
+    box-shadow:0 10px 25px rgba(139,30,63,.08);
+    transition:.35s;
+}
+
+.admin-order-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 18px 35px rgba(139,30,63,.15);
+}
+
+.admin-order-card h3{
+    color:#8B1E3F;
+    font-size:22px;
+    font-weight:700;
+    margin-bottom:22px;
+    padding-bottom:14px;
+    border-bottom:2px solid #f6dce4;
+}
+
+.admin-detail-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    padding:14px 0;
+    border-bottom:1px dashed #f2d9e1;
+}
+
+.admin-detail-row:last-child{
+    border-bottom:none;
+}
+
+.admin-detail-row span{
+    color: #77907F;
+    font-size:15px;
+    font-weight:500;
+}
+
+.admin-detail-row strong{
+    color:#8B1E3F;
+    font-size:15px;
+    font-weight:600;
+    text-align:right;
+    word-break:break-word;
+}
+
+.admin-order-card p{
+    color:#1F5B3E;
+    line-height:1.8;
+    font-size:15px;
+    margin-bottom:8px;
+}
+
+.admin-order-card p:last-child{
+    margin-bottom:0;
+}
+
+/* Customer Card */
+
+.admin-order-grid .admin-order-card:nth-child(1){
+
+    background:linear-gradient(
+        180deg,
+        #FBFAF4,
+        #fff8fa
+    );
+
+}
+
+/* Shipping Card */
+
+.admin-order-grid .admin-order-card:nth-child(2){
+
+    background:linear-gradient(
+        180deg,
+        #FBFAF4,
+        #fff6f8
+    );
+
+}
+
+/* Payment Card */
+
+.admin-order-grid .admin-order-card:nth-child(3){
+
+    background:linear-gradient(
+        180deg,
+        #FBFAF4,
+        #fff5f7
+    );
+
+}
+
+.admin-order-card strong{
+
+    color:#8B1E3F;
+
+}
+
+.admin-order-card span{
+
+    color:#1F5B3E;
+
+}
+.admin-order-table{
+    width:100%;
+    overflow-x:auto;
+    border-radius:15px;
+}
+
+.admin-order-table table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:850px;
+    background: #FBFAF4;
+}
+
+.admin-order-table thead{
+    background:linear-gradient(
+        135deg,
+        #8B1E3F,
+        #B32E58
+    );
+}
+
+.admin-order-table th{
+    padding:18px 15px;
+    color: #FFFFFF;
+    font-size:15px;
+    font-weight:600;
+    text-align:left;
+    letter-spacing:.4px;
+}
+
+.admin-order-table td{
+    padding:18px 15px;
+    border-bottom:1px solid #f4dce4;
+    color:#1F5B3E;
+    font-size:15px;
+    vertical-align:middle;
+}
+
+.admin-order-table tbody tr{
+    transition:.3s;
+}
+
+.admin-order-table tbody tr:hover{
+    background:#fff7fa;
+}
+
+.admin-product-image{
+    width:70px;
+    height:70px;
+    object-fit:cover;
+    border-radius:12px;
+    border:2px solid #f2d9e1;
+    background: #FBFAF4;
+    padding:4px;
+}
+
+.admin-order-bottom{
+    display:grid;
+    grid-template-columns:1fr 380px;
+    gap:25px;
+    margin-top:30px;
+}
+
+.admin-order-bottom .admin-order-card{
+    height:fit-content;
+}
+
+.admin-order-bottom h3{
+    color:#8B1E3F;
+}
+
+.admin-order-card select{
+    width:100%;
+    padding:14px 16px;
+    border:1px solid #e6ccd5;
+    border-radius:10px;
+    outline:none;
+    font-size:15px;
+    margin-top:15px;
+    margin-bottom:20px;
+    background: #FBFAF4;
+    color:#1F5B3E;
+    transition:.3s;
+}
+
+.admin-order-card select:focus{
+    border-color:#8B1E3F;
+    box-shadow:0 0 0 4px rgba(139,30,63,.10);
+}
+
+.admin-update-btn{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:600;
+    color: #FFFFFF;
+    background:linear-gradient(
+        135deg,
+        #D84C72,
+        #8B1E3F
+    );
+    transition:.35s;
+}
+
+.admin-update-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 12px 25px rgba(139,30,63,.25);
+}
+
+.admin-update-btn:active{
+    transform:scale(.98);
+}
+
+.admin-order-bottom .admin-detail-row{
+    padding:16px 0;
+}
+
+.admin-order-bottom .admin-detail-row strong{
+    font-size:16px;
+}
+
+.admin-order-bottom .admin-detail-row:last-child strong{
+    color:#8B1E3F;
+    font-size:18px;
+    font-weight:700;
+}
+/* ===========================
+   Responsive
+=========================== */
+
+@media(max-width:1200px){
+
+    .admin-order-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .admin-order-bottom{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .admin-order-page{
+
+        padding:15px;
+
+    }
+
+    .admin-order-header{
+
+        flex-direction:column;
+        align-items:flex-start;
+        gap:20px;
+
+    }
+
+    .admin-order-actions{
+
+        width:100%;
+
+    }
+
+    .admin-back-btn,
+    .admin-print-btn{
+
+        flex:1;
+
+    }
+
+    .admin-detail-row{
+
+        flex-direction:column;
+        align-items:flex-start;
+        gap:6px;
+
+    }
+
+    .admin-detail-row strong{
+
+        text-align:left;
+
+    }
+
+    .admin-product-image{
+
+        width:60px;
+        height:60px;
+
+    }
+
+}
+
+@media(max-width:576px){
+
+    .admin-order-header h2{
+
+        font-size:26px;
+
+    }
+
+    .admin-order-card{
+
+        padding:20px;
+
+    }
+
+    .admin-order-card h3{
+
+        font-size:20px;
+
+    }
+
+    .admin-order-table th,
+    .admin-order-table td{
+
+        padding:12px;
+
+    }
+
+}
+
+/* ===========================
+   Print Invoice
+=========================== */
+
+@media print{
+
+    body{
+
+        background: #FBFAF4 !important;
+
+    }
+
+    .no-print{
+
+        display:none !important;
+
+    }
+
+    .admin-order-page{
+
+        max-width:100%;
+        margin:0;
+        padding:0;
+
+    }
+
+    .admin-order-header{
+
+        background: #FBFAF4;
+        border:none;
+        box-shadow:none;
+        padding:0 0 20px;
+        margin-bottom:25px;
+
+    }
+
+    .admin-order-header h2{
+
+        color:#1F5B3E;
+        font-size:30px;
+
+    }
+
+    .admin-order-header p{
+
+        color:#1F5B3E;
+
+    }
+
+    .admin-order-grid{
+
+        grid-template-columns:1fr 1fr;
+        gap:18px;
+
+    }
+
+    .admin-order-card{
+
+        border:1px solid #ccc;
+        box-shadow:none;
+        background: #FBFAF4;
+        border-radius:8px;
+        page-break-inside:avoid;
+
+    }
+
+    .admin-order-card:hover{
+
+        transform:none;
+
+    }
+
+    .admin-order-card h3{
+
+        color:#1F5B3E;
+        border-bottom:1px solid #ccc;
+
+    }
+
+    .admin-detail-row{
+
+        border-bottom:1px solid #e5e5e5;
+
+    }
+
+    .admin-detail-row strong{
+
+        color:#1F5B3E;
+
+    }
+
+    .admin-order-table{
+
+        margin-top:20px;
+
+    }
+
+    .admin-order-table table{
+
+        min-width:100%;
+        border:1px solid #999;
+
+    }
+
+    .admin-order-table thead{
+
+        background:#eee !important;
+
+    }
+
+    .admin-order-table th{
+
+        color:#1F5B3E;
+        border:1px solid #999;
+        background:#eee !important;
+
+    }
+
+    .admin-order-table td{
+
+        border:1px solid #999;
+
+    }
+
+    .admin-product-image{
+
+        width:50px;
+        height:50px;
+        border:none;
+
+    }
+
+    .admin-order-bottom{
+
+        margin-top:25px;
+        grid-template-columns:1fr 1fr;
+
+    }
+
+    .admin-order-bottom .admin-order-card:last-child{
+
+        display:none;
+
+    }
+
+    .invoice-footer{
+
+        margin-top:40px;
+        border-top:2px solid #999;
+        padding-top:20px;
+        text-align:center;
+
+    }
+
+    .invoice-footer h3{
+
+        font-size:22px;
+        color:#1F5B3E;
+
+    }
+
+    .invoice-footer p{
+
+        color:#1F5B3E;
+        margin-top:10px;
+
+    }
+
+}

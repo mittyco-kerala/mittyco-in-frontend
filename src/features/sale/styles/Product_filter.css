@@ -1,0 +1,165 @@
+/* Filter Group */
+.filter_group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 22px;
+}
+.filter_heading{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.clear_btn{
+    border: none;
+    background-color: transparent;
+    color: #87002b;
+}
+
+.filter_group label {
+    margin-bottom: 8px;
+    font-size: .95rem;
+    font-weight: 500;
+    color: #1F5B3E;
+}
+
+
+/* Custom Select */
+.custom-select {
+    position: relative;
+    width: 100%;
+}
+
+
+/* Select Button */
+.select-btn {
+    width: 100%;
+    padding: 12px 14px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    border: 1px solid #DCE8DC;
+    border-radius: 10px;
+
+    background: #FBFAF4;
+    color: #1F5B3E;
+
+    font-size: .95rem;
+    cursor: pointer;
+
+    transition: all .3s ease;
+}
+
+.select-btn:hover {
+    border-color: #87002b;
+}
+
+.select-btn:focus {
+    outline: none;
+    border-color:#87002b ;
+    box-shadow: 0 0 0 3px rgba(156, 107, 48, .15);
+}
+
+
+/* Arrow */
+.arrow {
+    font-size: 18px;
+    color: #77907F;
+    transition: transform .25s ease;
+}
+
+.arrow.open {
+    transform: rotate(180deg);
+}
+
+
+/* Dropdown */
+.select-options {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+
+    width: 100%;
+
+    padding: 6px 0;
+    margin: 0;
+
+    list-style: none;
+
+    background: #FBFAF4;
+
+    border: 1px solid #ececec;
+    border-radius: 10px;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+
+    z-index: 100;
+
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+
+/* Option */
+.select-option {
+    padding: 12px 14px;
+    color: #1F5B3E;
+    cursor: pointer;
+    transition: .2s;
+}
+
+
+/* Hover */
+.select-option:hover {
+    background: rgba(156, 107, 48, .08);
+    color: #9c6b30;
+}
+
+
+/* Active */
+.select-option.active {
+    background: #87002b;
+    color: #FFFFFF;
+}
+
+
+/* Scrollbar */
+.select-options::-webkit-scrollbar {
+    width: 6px;
+}
+
+.select-options::-webkit-scrollbar-track {
+    background: #FBFAF4;
+}
+
+.select-options::-webkit-scrollbar-thumb {
+    background: #c5c5c5;
+    border-radius: 20px;
+}
+
+.select-options::-webkit-scrollbar-thumb:hover {
+    background: #9c6b30;
+}
+.apply_btn{
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    background-color: #87002b;
+    padding: 15px 10px;
+    text-align: center;
+    color: #FFFFFF;
+}
+
+/* Mobile */
+@media (max-width:1024px) {
+
+    .filter_group {
+        margin-bottom: 10px;
+    }
+.filter_sidebar {
+        width: 100%;
+        position: static;
+    }
+
+}

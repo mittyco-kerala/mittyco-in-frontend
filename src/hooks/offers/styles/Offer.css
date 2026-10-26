@@ -1,0 +1,169 @@
+/* Container padding */
+.offer-banner-container {
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #FBFAF4;
+}
+
+/* The banner shell */
+.offer-banner {
+  width: 100%;
+  max-width: 1200px;
+  height: 250px;
+  margin: 0 auto;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* Full-screen background image */
+.offer-image-fullscreen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.offer-image-fullscreen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 1;
+}
+
+/* Foreground Content Overlay */
+.offer-content-overlay {
+  position: relative;
+  z-index: 2; /* Forces content to sit over the image */
+  height: 100%;
+  width: 100%;
+  text-align: left;
+  color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 60px;
+  box-sizing: border-box;
+  
+  /* Semi-transparent dark gradient shading on the left to keep text highly legible */
+  background: linear-gradient(
+    to right, 
+    rgba(128, 21, 56, 0.85) 0%, 
+    rgba(128, 21, 56, 0.4) 50%, 
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+.offer-tag {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  font-weight: 500;
+  opacity: 0.95;
+}
+
+.offer-title {
+  font-family: 'Georgia', serif;
+  font-size: 26px;
+  font-weight: bold;
+  margin: 0;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Enhances text contrast */
+  overflow-wrap: anywhere;
+}
+
+.offer-description {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0;
+  max-width: 500px;
+  opacity: 0.9;
+  font-weight: 400;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* The elegant CTA button */
+.offer-btn {
+  margin-top: 12px;
+  background-color: #FBFAF4;
+  color: #F4C430;
+  border: none;
+  padding: 12px 32px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  border-radius: 25px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease-in-out;
+}
+
+.offer-btn:hover {
+  background-color: #FBFAF4;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Fallback/Loading states styling */
+.offer-loading, .offer-error {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: sans-serif;
+  color: #F4C430;
+}
+
+/* Responsiveness adjustments for smaller devices */
+@media (max-width: 768px) {
+  .offer-content-overlay {
+    padding: 0 30px;
+    background: linear-gradient(
+      to right, 
+      rgba(128, 21, 56, 0.95) 0%, 
+      rgba(128, 21, 56, 0.7) 70%, 
+      rgba(128, 21, 56, 0.4) 100%
+    );
+  }
+  .offer-description {
+    max-width: 80%;
+  }
+}
+
+@media (max-width: 480px) {
+  .offer-banner-container {
+    padding: 14px 10px;
+  }
+
+  .offer-banner {
+    height: 230px;
+  }
+
+  .offer-content-overlay {
+    padding: 0 22px;
+    gap: 7px;
+  }
+
+  .offer-title {
+    font-size: clamp(20px, 6vw, 26px);
+  }
+
+  .offer-description {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .offer-btn {
+    padding: 10px 22px;
+  }
+}

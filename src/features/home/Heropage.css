@@ -1,0 +1,643 @@
+.hero-page-wrapper {
+    width: 100%;
+    margin-top: 80px; /* spacing for fixed navbar */
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ---------------- Top Promo Carousel ---------------- */
+.top-promo-carousel {
+    width: 100%;
+    height: clamp(38px, 3.2vw, 60px);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    background: #f0f0f0;
+}
+
+.promo-slides {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.promo-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease;
+}
+
+.promo-slide.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.promo-slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.promo-slide h3 {
+    margin: 0;
+    font-family: Inter, Arial, Helvetica, sans-serif;
+    font-size: clamp(8px, 1.5vw + 4px, 16px);
+    font-weight: 600;
+}
+
+.promo-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    color: #FFF;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10;
+    height: 100%;
+    padding: 0 15px;
+    opacity: 0;
+    transition: opacity 0.3s ease, background 0.3s;
+}
+
+.top-promo-carousel:hover .promo-nav-btn {
+    opacity: 1;
+}
+
+.promo-nav-btn:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.promo-nav-btn.left {
+    left: 0;
+}
+
+.promo-nav-btn.right {
+    right: 0;
+}
+
+/* ---------------- Split Layout ---------------- */
+.hero-split-layout {
+    width: 100%;
+    height: clamp(360px, 38vw, 620px);
+    display: flex;
+    gap: 0; /* no gap */
+    padding: 0; /* padding moved to wrapper */
+    box-sizing: border-box;
+    background: #FBFAF4;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ---------------- Main Carousel (Left ~70%) ---------------- */
+.hero-carousel-section {
+    flex: 0 0 68%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0; /* flush edges */
+    height: 100%;
+}
+
+.hero-split-layout.single .hero-carousel-section {
+    flex-basis: 100%;
+}
+
+/* ---------------- Fixed Side Banner (Right ~28%) ---------------- */
+.hero-fixed-banner-section {
+    flex: 1; 
+    height: 100%; /* full height to touch top and bottom */
+    border-radius: 0; /* flush edges */
+    overflow: hidden;
+    position: relative;
+}
+
+.fixed-banner-content {
+    width: 100%;
+    height: 100%;
+}
+
+.fixed-banner-content > a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.fixed-banner-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+/* ---------------- Slide ---------------- */
+
+.hero-slide {
+    position: absolute;
+    inset: 0;
+
+    opacity: 0;
+    visibility: hidden;
+
+    z-index: 1;
+
+    transition:
+        opacity 1.4s cubic-bezier(.4, 0, .2, 1),
+        visibility 1.4s;
+}
+
+.hero-slide.active {
+    opacity: 1;
+    visibility: visible;
+    z-index: 2;
+}
+
+.hero-image {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    object-position: center;
+
+    display: block;
+
+    transform: scale(1.025);
+
+    transition:
+        transform 6s cubic-bezier(.22, 1, .36, 1);
+
+    will-change: transform;
+}
+
+.hero-slide.active .hero-image {
+    transform: scale(1);
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, .62) 0%,
+        rgba(0, 0, 0, .28) 35%,
+        rgba(0, 0, 0, .04) 72%
+    );
+
+    transition: opacity 1.2s ease;
+}
+
+/* ---------------- Content ---------------- */
+
+.hero-content {
+    position: absolute;
+
+    left: clamp(18px, 4vw, 64px);
+    bottom: clamp(14px, 2.8vw, 34px);
+
+    z-index: 3;
+
+    color: #FFFFFF;
+    max-width: min(460px, 48%);
+
+    opacity: 0;
+    transform: translateY(18px);
+
+    transition:
+        opacity .8s ease .25s,
+        transform .9s cubic-bezier(.22, 1, .36, 1) .25s;
+}
+
+.hero-slide.active .hero-content {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.hero-subtitle {
+    display: block;
+    margin-bottom: 6px;
+    font-family: Inter, Arial, Helvetica, sans-serif;
+    font-size: clamp(0.5rem, 0.8vw, 0.75rem);
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #FFFFFF;
+}
+
+.hero-content h1 {
+    font-family: Inter, Arial, Helvetica, sans-serif;
+    font-size: clamp(1.4rem, 2.5vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 10px;
+}
+
+.hero-content p {
+    font-family: Inter, Arial, Helvetica, sans-serif;
+    font-size: clamp(0.72rem, 0.8vw, 0.95rem);
+    font-weight: 400;
+    line-height: 1.5;
+    margin-bottom: 14px;
+    color: rgba(255,255,255,.92);
+    max-width: 480px;
+}
+
+.shop-btn-premium {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 20px;
+    background: #ffffff;
+    color: #171717;
+    border: 1px solid #ffffff;
+    text-decoration: none;
+    font-family: Inter, Arial, Helvetica, sans-serif;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: clamp(0.58rem, 0.75vw, 0.75rem);
+    transition: all 0.4s ease;
+    border-radius: 999px;
+    gap: 12px;
+}
+
+.shop-btn-premium .arrow {
+    transition: transform 0.3s ease;
+}
+
+.shop-btn-premium:hover {
+    background: #F4C430;
+    border-color: #F4C430;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.shop-btn-premium:hover .arrow {
+    transform: translateX(5px);
+}
+
+/* ---------------- Navigation Arrows ---------------- */
+
+.carousel-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+    background: rgba(255, 255, 255, 0.86);
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    font-size: 24px;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-50%) scale(.92);
+    transition: opacity 0.2s ease, transform 0.2s ease, background 0.3s ease;
+}
+
+.hero-carousel-section:hover .carousel-nav-btn,
+.hero-carousel-section:focus-within .carousel-nav-btn {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(-50%) scale(1);
+}
+
+.carousel-nav-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.prev-btn {
+    left: 15px;
+}
+
+.next-btn {
+    right: 15px;
+}
+
+/* ---------------- Dots ---------------- */
+
+.hero-dots {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 7px;
+    z-index: 5;
+}
+
+.modern-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.active-modern-dot {
+    background: #fff;
+    transform: scale(1.2);
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+/* ---------------- Tablet ---------------- */
+
+@media(max-width:768px){
+.hero-split-layout {
+    display: flex;
+    flex-direction: row;
+    height: auto;
+}
+
+.hero-carousel-section {
+    flex: 0 0 72%;
+    width: auto;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: var(--hero-ratio, 16 / 7);
+}
+
+.hero-fixed-banner-section {
+    flex: 1;
+    width: auto;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: var(--side-ratio, 16 / 7);
+}
+
+.top-promo-carousel {
+    height: auto;
+    min-height: 0;
+}
+
+.hero-content{
+    left:5%;
+    right:5%;
+    bottom:8%;
+    max-width:72%;
+}
+
+.hero-content h1{
+    font-size: clamp(1.15rem, 4.7vw, 2.1rem);
+    margin-bottom: 8px;
+}
+
+.hero-content p {
+    max-width: 80%;
+}
+
+.hero-content p{
+    margin-bottom: 15px;
+}
+
+.carousel-nav-btn {
+    width: 38px;
+    height: 34px;
+    font-size: 21px;
+}
+
+}
+
+/* ---------------- Mobile ---------------- */
+
+@media(max-width:480px){
+
+.hero-page-wrapper {
+    padding: 0 8px;
+}
+
+.hero-split-layout {
+    height: auto;
+}
+
+.hero-carousel-section {
+    min-height: 0;
+    aspect-ratio: var(--hero-ratio, 4 / 3);
+}
+
+.hero-fixed-banner-section {
+    min-height: 0;
+    aspect-ratio: var(--side-ratio, 4 / 3);
+}
+
+.top-promo-carousel {
+    height: auto;
+    min-height: 0;
+}
+
+.hero-content{
+    left:4%;
+    right:4%;
+    bottom:8%;
+    max-width:72%;
+}
+
+.hero-subtitle{
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.hero-content h1{
+    font-size: clamp(1.15rem, 7vw, 2rem);
+    margin-bottom: 5px;
+}
+
+.hero-content p{
+    display: block;
+    max-width: 100%;
+    font-size: clamp(.72rem, 2.8vw, .9rem);
+    line-height: 1.35;
+    margin-bottom: 10px;
+}
+
+.shop-btn-premium {
+    width: auto;
+    padding: 6px 12px;
+    border-radius: 999px;
+}
+
+}
+
+/* -------- 320px -------- */
+
+@media(max-width:320px){
+
+.top-promo-carousel {
+    height: auto;
+    min-height: 0;
+}
+
+.hero-split-layout {
+    height: auto;
+}
+
+.hero-carousel-section {
+    min-height: 0;
+    aspect-ratio: var(--hero-ratio, 4 / 3);
+}
+
+.hero-fixed-banner-section {
+    min-height: 0;
+    aspect-ratio: var(--side-ratio, 4 / 3);
+}
+
+.hero-content {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    max-width: calc(100% - 16px);
+}
+
+.hero-subtitle {
+    font-size: .42rem;
+    letter-spacing: .5px;
+}
+
+.hero-content h1 {
+    max-width: 100%;
+    font-size: .95rem;
+    overflow-wrap: anywhere;
+}
+
+.hero-content p {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: .6rem;
+    line-height: 1.2;
+    margin-bottom: 6px;
+}
+
+.shop-btn-premium {
+    gap: 3px;
+    padding: 4px 8px;
+    font-size: .5rem;
+}
+
+.carousel-nav-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 16px;
+}
+
+}
+
+/* Compact hero controls across mobile, tablet, and desktop screens. */
+.hero-page-wrapper .shop-btn-premium {
+    width: fit-content;
+    max-width: 100%;
+    min-height: 42px;
+    padding: clamp(9px, .75vw, 13px) clamp(18px, 1.35vw, 26px);
+    gap: clamp(6px, .45vw, 10px);
+    font-size: clamp(11px, .9vw, 14px);
+    line-height: 1.2;
+    letter-spacing: .5px;
+    background: transparent;
+    color: #fff;
+    border-color: rgba(255, 255, 255, .75);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .5);
+}
+
+.hero-page-wrapper .shop-btn-premium:hover,
+.hero-page-wrapper .shop-btn-premium:focus-visible,
+.hero-page-wrapper .shop-btn-premium:active {
+    background: #F4C430;
+    border-color: #F4C430;
+    color: #fff;
+    box-shadow: none;
+    transform: none;
+}
+
+.hero-page-wrapper .shop-btn-premium .arrow {
+    position: static;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+}
+
+.hero-page-wrapper .shop-btn-premium:hover .arrow {
+    transform: translateX(2px);
+}
+
+.hero-page-wrapper .hero-dots {
+    bottom: 4px;
+    gap: 0;
+}
+
+/* Keep the click area larger than the visible indicator. */
+.hero-page-wrapper .modern-dot {
+    display: grid;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    background: transparent;
+    box-shadow: none;
+    transform: none;
+}
+
+.hero-page-wrapper .modern-dot::after {
+    content: "";
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .4);
+}
+
+.hero-page-wrapper .active-modern-dot::after {
+    background: #fff;
+    transform: scale(1.2);
+}
+
+/* Mittyco home page uses one focused hero banner. The old carousel rules are
+   kept above for legacy dashboard previews, while the storefront renders only
+   this single, full-width banner. */
+.mittyco-single-hero {
+    width: 100%;
+    height: clamp(280px, 32vw, 460px);
+    margin-top: 80px;
+    background: #FBFAF4;
+    overflow: hidden;
+}
+
+.mittyco-single-hero-image-wrap {
+    width: 100%;
+    height: 100%;
+    background: #FBFAF4;
+    overflow: hidden;
+}
+
+.mittyco-single-hero-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 42%;
+}
+
+@media (max-width: 760px) {
+    .mittyco-single-hero {
+        height: 280px;
+        margin-top: 80px;
+    }
+}

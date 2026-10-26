@@ -1,0 +1,16 @@
+.admin-logout-button:hover,
+.admin-logout-button:focus-visible,
+.admin-logout-button:active {
+    background: var(--admin-brand);
+    color: #fff;
+}
+
+.admin-logout-button:focus-visible {
+    outline: 3px solid rgba(255, 144, 0, .25);
+    outline-offset: 2px;
+}
+
+.logout:hover {
+    color: var(--admin-brand-dark, #DCA900);
+    background: #fff4e6;
+}

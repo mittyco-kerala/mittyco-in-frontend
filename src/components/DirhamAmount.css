@@ -1,0 +1,22 @@
+.dirham-amount {
+    display: inline-flex;
+    align-items: baseline;
+    gap: .28em;
+    white-space: nowrap;
+}
+
+.currency-symbol {
+    flex: 0 0 auto;
+    color: currentColor;
+    min-width: .7em;
+    display: inline-block;
+    align-self: baseline;
+}
+
+.dirham-amount-sign {
+    line-height: 1;
+}
+
+.dirham-amount-value {
+    line-height: inherit;
+}

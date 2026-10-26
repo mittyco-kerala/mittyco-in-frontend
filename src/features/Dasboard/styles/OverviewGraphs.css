@@ -1,0 +1,29 @@
+.admin-app .overview-graphs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 22px;
+}
+.admin-app .overview-count-graph { min-width: 0; margin: 0; }
+.admin-app .overview-count-graph .admin-panel-heading { align-items: center; gap: 16px; }
+.admin-app .overview-count-graph h3 { font-family: inherit; font-size: 16px; }
+.admin-app .overview-count-graph figcaption p { line-height: 1.5; color: #526870; }
+.admin-app .overview-graph-rows { list-style: none; margin: 0; padding: 22px; display: grid; gap: 20px; }
+.admin-app .overview-graph-label { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 9px; font-size: 13px; color: #344f59; }
+.admin-app .overview-graph-label > span { display: flex; align-items: center; gap: 8px; }
+.admin-app .overview-graph-label strong { font-variant-numeric: tabular-nums; text-align: right; }
+.admin-app .overview-graph-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.admin-app .overview-graph-track { height: 12px; border-radius: 4px; background: #edf2f0; overflow: hidden; }
+.admin-app .overview-graph-fill { height: 100%; border-radius: inherit; transition: width .35s ease; }
+.admin-app .overview-graph-loading { height: 12px; width: 100%; }
+.admin-app .overview-graph-note { margin: 0; padding: 0 22px 22px; font-size: 12px; color: #526870; line-height: 1.6; }
+@media (max-width: 1000px) {
+    .admin-app .overview-graphs { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 400px) {
+    .admin-app .overview-graph-rows { padding: 16px; }
+    .admin-app .overview-graph-note { padding: 0 16px 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .admin-app .overview-graph-fill { transition: none; }
+}

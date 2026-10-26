@@ -1,0 +1,47 @@
+.welcome-bonus-notifications { position: relative; display: flex; align-items: center; }
+.notification-bell { position: relative; display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #1F5B3E; cursor: pointer; }
+.notification-bell:hover, .notification-bell:focus-visible { color: #F4C430; background: #fff0d8; outline: none; }
+.notification-bell svg { width: 21px; height: 21px; }
+.notification-badge { position: absolute; top: -7px; right: -8px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; display: grid; place-items: center; background: #F4C430; color: #fff; font: 700 10px/1 Arial, sans-serif; }
+.notification-panel { position: fixed; top: 88px; right: 18px; z-index: 1100; width: min(390px, calc(100vw - 24px)); max-height: min(560px, calc(100vh - 110px)); overflow: hidden auto; border: 1px solid #DCE8DC; border-radius: 12px; background: #fff; box-shadow: 0 18px 42px rgba(27, 48, 55, .2); }
+.notification-panel-header { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; padding: 15px 16px; border-bottom: 1px solid #edf0eb; background: #FBFAF4; }
+.notification-panel-header strong, .notification-panel-header span { display: block; }
+.notification-panel-header strong { color: #293d45; font-size: 15px; }
+.notification-panel-header span { margin-top: 2px; color: #70818a; font-size: 11px; }
+.notification-panel-header button { display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 7px; background: transparent; color: #1F5B3E; cursor: pointer; }
+.notification-panel-header button:hover { background: #fff0d8; color: #B07A00; }
+.notification-list { display: grid; }
+.notification-state { margin: 0; padding: 24px 18px; color: #70818a; font-size: 13px; text-align: center; }
+.welcome-bonus-notification { display: grid; gap: 12px; padding: 15px 16px; border-bottom: 1px solid #edf0eb; }
+.welcome-bonus-notification:last-child { border-bottom: 0; }
+.welcome-bonus-notification.is-unread { border-left: 3px solid #F4C430; background: #fffaf3; }
+.notification-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.welcome-bonus-notification-copy h3 { margin: 0 0 5px; color: #293d45; font-size: 14px; }
+.notification-unread-mark { flex: 0 0 auto; border-radius: 999px; padding: 3px 7px; background: #F4C430; color: #fff; font: 800 10px/1 Inter, Arial, sans-serif; text-transform: uppercase; }
+.welcome-bonus-notification-copy p { margin: 0; color: #60747b; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+.welcome-bonus-notification-copy .welcome-bonus-target { margin-top: 9px; color: #293d45; font-size: 13px; font-weight: 700; }
+.welcome-bonus-discount { display: block; margin-top: 8px; color: #23815b; font-size: 13px; }
+.masked-redemption-code { display: inline-block; margin-top: 9px !important; padding: 5px 8px; border: 1px dashed #cfd8d3; border-radius: 5px; color: #60747b; font: 700 12px/1.2 monospace !important; letter-spacing: 1px; }
+.masked-redemption-code span { color: #415e66; font-family: Inter, Arial, sans-serif; font-size: 11px; letter-spacing: 0; }
+.welcome-bonus-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.welcome-bonus-action { min-height: 36px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid transparent; border-radius: 7px; padding: 7px 10px; cursor: pointer; font: 700 12px Inter, Arial, sans-serif; }
+.welcome-bonus-action.claim { background: #F4C430; color: #fff; }
+.welcome-bonus-action.claim:hover { background: #DCA900; }
+.welcome-bonus-action.copy { border-color: #cedad4; background: #fff; color: #375a60; }
+.welcome-bonus-action.copy:hover { background: #eef6f3; }
+.welcome-bonus-action:disabled { cursor: wait; opacity: .62; }
+@media (max-width: 768px) {
+  .notification-panel { right: 8px; width: min(430px, calc(100vw - 16px)); max-height: calc(100dvh - 96px); }
+  .welcome-bonus-notification { padding: 14px; }
+}
+@media (max-width: 455px) {
+  .welcome-bonus-notifications-mobile { width: 100%; height: 100%; justify-content: center; }
+  .welcome-bonus-notifications-mobile .notification-bell { width: 100%; height: 100%; }
+  .notification-panel { top: auto; bottom: 70px; right: 12px; max-height: min(550px, calc(100vh - 94px)); }
+}
+@media (max-width: 320px) {
+  .notification-panel { width: calc(100vw - 16px); right: 8px; }
+  .notification-title-row { align-items: center; }
+  .welcome-bonus-actions { flex-direction: column; }
+  .welcome-bonus-action { width: 100%; }
+}
