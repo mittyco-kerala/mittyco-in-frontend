@@ -849,7 +849,7 @@ function Single_product() {
                 </div>
 
                 {/* RIGHT: PURCHASE PANEL */}
-                <div className="purchase-panel eehook-purchase-panel">
+                <div className="purchase-panel mittyco-purchase-panel">
 
                     <div className="delivery-time-section">
                         <div className="shipping-fee">+ <DirhamAmount value={data.shipping_fee || "13.00"} /> Shipping</div>

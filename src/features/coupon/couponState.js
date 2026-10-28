@@ -1,7 +1,7 @@
 import client from "../../lib/ApiClient";
 import { getAuthValue, hasAuthSession } from "../auth/authUtils";
 
-const STORAGE_PREFIX = "eehook:coupon-applications:v1";
+const STORAGE_PREFIX = "mittyco:coupon-applications:v1";
 
 export function normalizeCouponCode(code) {
     return String(code || "").trim().toUpperCase();

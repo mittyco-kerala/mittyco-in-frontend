@@ -1,4 +1,4 @@
-.eehook-checkout{
+.mittyco-checkout{
     width: 100%;
     min-width: 0;
     max-width:1280px;
@@ -15,11 +15,11 @@
     font-weight: 600;
 }
 
-.eehook-checkout-header{
+.mittyco-checkout-header{
     margin-bottom:32px;
 }
 
-.eehook-checkout-title{
+.mittyco-checkout-title{
     font-size:34px;
     font-weight:600;
     color: #1F5B3E;
@@ -27,12 +27,12 @@
     letter-spacing:-.5px;
 }
 
-.eehook-checkout-subtitle{
+.mittyco-checkout-subtitle{
     font-size:15px;
     color:#6b7280;
 }
 
-.eehook-checkout-wrapper{
+.mittyco-checkout-wrapper{
     min-width: 0;
     display:grid;
     grid-template-columns:minmax(0,2fr) 420px;
@@ -40,20 +40,20 @@
     align-items:start;
 }
 
-.eehook-checkout-left{
+.mittyco-checkout-left{
     min-width: 0;
     display:flex;
     flex-direction:column;
     gap:24px;
 }
 
-.eehook-checkout-right{
+.mittyco-checkout-right{
     min-width: 0;
     position:sticky;
     top:20px;
 }
 
-.eehook-checkout-card{
+.mittyco-checkout-card{
     min-width: 0;
     background: #FFFFFF;
     border:1px solid #ececec;
@@ -62,26 +62,26 @@
     transition:border-color .25s ease,box-shadow .25s ease;
 }
 
-.eehook-checkout-card:hover{
+.mittyco-checkout-card:hover{
     border-color: #DCE8DC;
     box-shadow:0 8px 24px rgba(0,0,0,.06);
 }
 
-.eehook-card-header{
+.mittyco-card-header{
     display:flex;
     justify-content:space-between;
     align-items:center;
     margin-bottom:22px;
 }
 
-.eehook-card-header h2,
-.eehook-checkout-card h2{
+.mittyco-card-header h2,
+.mittyco-checkout-card h2{
     font-size:21px;
     font-weight:600;
     color: #1F5B3E;
 }
 
-.eehook-add-address-btn{
+.mittyco-add-address-btn{
     border:none;
     background:#F4C430;
     color: #FFFFFF;
@@ -93,15 +93,15 @@
     transition:background .25s ease;
 }
 
-.eehook-add-address-btn:hover{
+.mittyco-add-address-btn:hover{
     background:#DCA900;
 }
 
-.eehook-add-address-btn:active{
+.mittyco-add-address-btn:active{
     transform:scale(.98);
 }
 
-.eehook-address-card{
+.mittyco-address-card{
     display:flex;
     gap:16px;
     align-items:flex-start;
@@ -113,45 +113,45 @@
     transition:border-color .25s ease,background .25s ease;
 }
 
-.eehook-address-card:last-child{
+.mittyco-address-card:last-child{
     margin-bottom:0;
 }
 
-.eehook-address-card:hover{
+.mittyco-address-card:hover{
     border-color:#c7c7c7;
     background:#FBFAF4;
 }
 
-.eehook-address-card.active{
+.mittyco-address-card.active{
     border-color:#F4C430;
     background:#FFF5E5;
 }
 
-.eehook-address-card input{
+.mittyco-address-card input{
     margin-top:4px;
     accent-color:#F4C430;
 }
 
-.eehook-address-info{
+.mittyco-address-info{
     min-width: 0;
     flex:1;
 }
 
-.eehook-address-info h4{
+.mittyco-address-info h4{
     font-size:17px;
     font-weight:600;
     color: #1F5B3E;
     margin-bottom:6px;
 }
 
-.eehook-address-info p{
+.mittyco-address-info p{
     font-size:14px;
     color: #1F5B3E;
     line-height:1.6;
     margin-bottom:2px;
 }
 
-.eehook-payment-card{
+.mittyco-payment-card{
     display:flex;
     flex-direction:column;
     align-items:stretch;
@@ -163,24 +163,24 @@
     transition:border-color .25s ease;
 }
 
-.eehook-payment-card:hover{
+.mittyco-payment-card:hover{
     border-color:#d2d2d2;
 }
 
-.eehook-payment-title{
+.mittyco-payment-title{
     font-size:16px;
     font-weight:600;
     color: #1F5B3E;
     margin-bottom:5px;
 }
 
-.eehook-payment-card p{
+.mittyco-payment-card p{
     font-size:14px;
     color: #1F5B3E;
     line-height:1.6;
 }
 
-.eehook-payment-option{
+.mittyco-payment-option{
     display:flex;
     align-items:flex-start;
     gap:12px;
@@ -191,35 +191,35 @@
     transition:border-color .25s ease,background .25s ease;
 }
 
-.eehook-payment-option:hover,
-.eehook-payment-option.active{
+.mittyco-payment-option:hover,
+.mittyco-payment-option.active{
     border-color:#F4C430;
     background:#FFF8EC;
 }
 
-.eehook-payment-option input{
+.mittyco-payment-option input{
     margin-top:3px;
     accent-color:#F4C430;
 }
 
-.eehook-payment-option span{
+.mittyco-payment-option span{
     display:flex;
     flex-direction:column;
     gap:3px;
 }
 
-.eehook-payment-option strong{
+.mittyco-payment-option strong{
     color:#1F5B3E;
     font-size:14px;
 }
 
-.eehook-payment-option small{
+.mittyco-payment-option small{
     color:#6b7280;
     font-size:12px;
     line-height:1.5;
 }
 
-.eehook-empty-box{
+.mittyco-empty-box{
     padding:45px 20px;
     border:1px dashed #d7d7d7;
     border-radius:10px;
@@ -227,7 +227,7 @@
     color: #1F5B3E;
     font-size:15px;
 }
-.eehook-summary-item{
+.mittyco-summary-item{
     display:flex;
     align-items:center;
     gap:16px;
@@ -235,11 +235,11 @@
     border-bottom:1px solid #efefef;
 }
 
-.eehook-summary-item:last-child{
+.mittyco-summary-item:last-child{
     border-bottom:none;
 }
 
-.eehook-summary-image{
+.mittyco-summary-image{
     width:78px;
     height:96px;
     border-radius:10px;
@@ -248,7 +248,7 @@
     flex-shrink:0;
 }
 
-.eehook-summary-image img{
+.mittyco-summary-image img{
     width:100%;
     height:100%;
     object-fit:cover;
@@ -256,16 +256,16 @@
     transition:transform .3s ease;
 }
 
-.eehook-summary-item:hover .eehook-summary-image img{
+.mittyco-summary-item:hover .mittyco-summary-image img{
     transform:scale(1.05);
 }
 
-.eehook-summary-details{
+.mittyco-summary-details{
     min-width: 0;
     flex:1;
 }
 
-.eehook-summary-details h4{
+.mittyco-summary-details h4{
     font-size:16px;
     font-weight:600;
     color: #1F5B3E;
@@ -275,26 +275,26 @@
     word-break:break-word;
 }
 
-.eehook-summary-details p{
+.mittyco-summary-details p{
     font-size:13px;
     color: #1F5B3E;
     margin-bottom:4px;
 }
 
-.eehook-summary-price{
+.mittyco-summary-price{
     font-size:17px;
     font-weight:600;
     color: #1F5B3E;
     white-space:nowrap;
 }
 
-.eehook-summary-total{
+.mittyco-summary-total{
     margin-top:24px;
     padding-top:22px;
     border-top:1px solid #e8e8e8;
 }
 
-.eehook-summary-row{
+.mittyco-summary-row{
     min-width: 0;
     display:flex;
     justify-content:space-between;
@@ -304,23 +304,23 @@
     color: #1F5B3E;
 }
 
-.eehook-summary-row:last-child{
+.mittyco-summary-row:last-child{
     margin-bottom:0;
 }
 
-.eehook-summary-row span:last-child{
+.mittyco-summary-row span:last-child{
     min-width: 0;
     overflow-wrap: anywhere;
     font-weight:500;
     color: #1F5B3E;
 }
 
-.eehook-summary-row span:first-child{
+.mittyco-summary-row span:first-child{
     min-width: 0;
     overflow-wrap: anywhere;
 }
 
-.eehook-grand-total{
+.mittyco-grand-total{
     margin-top:18px;
     padding-top:18px;
     border-top:1px solid #ddd;
@@ -328,30 +328,30 @@
     font-weight:600;
 }
 
-.eehook-grand-total strong{
+.mittyco-grand-total strong{
     color:#1F5B3E;
 }
 
-.eehook-shipping-free{
+.mittyco-shipping-free{
     color:#1a8f3c !important;
     font-weight:600 !important;
 }
 
-.eehook-checkout-divider{
+.mittyco-checkout-divider{
     width:100%;
     height:1px;
     background:#ececec;
     margin:22px 0;
 }
 
-.eehook-payment-note{
+.mittyco-payment-note{
     margin-top:18px;
     font-size:13px;
     color: #1F5B3E;
     text-align:center;
     line-height:1.6;
 }
-.eehook-checkout-btn{
+.mittyco-checkout-btn{
     width:100%;
     height:52px;
     border:none;
@@ -364,22 +364,22 @@
     transition:background .25s ease,box-shadow .25s ease;
 }
 
-.eehook-checkout-btn:hover{
+.mittyco-checkout-btn:hover{
     background:#DCA900;
     box-shadow:0 10px 24px rgba(139,47,69,.22);
 }
 
-.eehook-checkout-btn:active{
+.mittyco-checkout-btn:active{
     transform:scale(.99);
 }
 
-.eehook-checkout-btn:disabled{
+.mittyco-checkout-btn:disabled{
     background:#c7c7c7;
     cursor:not-allowed;
     box-shadow:none;
 }
 
-.eehook-loading{
+.mittyco-loading{
     display:flex;
     justify-content:center;
     align-items:center;
@@ -390,33 +390,33 @@
 
 }
 
-.eehook-summary-divider{
+.mittyco-summary-divider{
     height:1px;
     background:#e8e8e8;
     margin:18px 0;
 }
 
-.eehook-grand-total{
+.mittyco-grand-total{
     display:flex;
     justify-content:space-between;
     align-items:center;
 }
 
-.eehook-grand-total h3{
+.mittyco-grand-total h3{
     margin:0;
     font-size:18px;
     font-weight:600;
     color: #1F5B3E;
 }
 
-.eehook-grand-total small{
+.mittyco-grand-total small{
     display:block;
     margin-top:4px;
     color:#888;
     font-size:12px;
 }
 
-.eehook-grand-total h2{
+.mittyco-grand-total h2{
     margin:0;
     font-size:28px;
     font-weight:700;
@@ -426,11 +426,11 @@
 
 @media (max-width:1024px){
 
-    .eehook-checkout-wrapper{
+    .mittyco-checkout-wrapper{
         grid-template-columns:1fr;
     }
 
-    .eehook-checkout-right{
+    .mittyco-checkout-right{
         position:static;
     }
 
@@ -438,34 +438,34 @@
 
 @media (max-width:768px){
 
-    .eehook-checkout{
+    .mittyco-checkout{
         margin:24px auto;
         padding:0 16px;
     }
 
-    .eehook-checkout-title{
+    .mittyco-checkout-title{
         font-size:28px;
     }
 
-    .eehook-checkout-card{
+    .mittyco-checkout-card{
         padding:20px;
     }
 
-    .eehook-card-header{
+    .mittyco-card-header{
         flex-direction:column;
         align-items:flex-start;
         gap:16px;
     }
 
-    .eehook-add-address-btn{
+    .mittyco-add-address-btn{
         width:100%;
     }
 
-    .eehook-summary-item{
+    .mittyco-summary-item{
         align-items:flex-start;
     }
 
-    .eehook-summary-image{
+    .mittyco-summary-image{
         width:70px;
         height:90px;
     }
@@ -474,57 +474,57 @@
 
 @media (max-width:576px){
 
-    .eehook-checkout{
+    .mittyco-checkout{
         padding:0 12px;
     }
 
-    .eehook-checkout-title{
+    .mittyco-checkout-title{
         font-size:24px;
     }
 
-    .eehook-checkout-subtitle{
+    .mittyco-checkout-subtitle{
         font-size:14px;
     }
 
-    .eehook-checkout-card{
+    .mittyco-checkout-card{
         padding:16px;
         border-radius:10px;
     }
 
-    .eehook-address-card{
+    .mittyco-address-card{
         padding:14px;
     }
 
-    .eehook-summary-item{
+    .mittyco-summary-item{
         gap:12px;
     }
 
-    .eehook-summary-image{
+    .mittyco-summary-image{
         width:64px;
         height:82px;
     }
 
-    .eehook-summary-details h4{
+    .mittyco-summary-details h4{
         font-size:15px;
     }
 
-    .eehook-summary-details p{
+    .mittyco-summary-details p{
         font-size:12px;
     }
 
-    .eehook-summary-price{
+    .mittyco-summary-price{
         font-size:15px;
     }
 
-    .eehook-summary-row{
+    .mittyco-summary-row{
         font-size:14px;
     }
 
-    .eehook-grand-total{
+    .mittyco-grand-total{
         font-size:17px;
     }
 
-    .eehook-checkout-btn{
+    .mittyco-checkout-btn{
         height:48px;
         font-size:14px;
     }

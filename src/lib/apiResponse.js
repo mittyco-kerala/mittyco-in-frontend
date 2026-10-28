@@ -1,4 +1,4 @@
-export const HTML_API_RESPONSE_MESSAGE = "The API returned an HTML page instead of JSON. Check the Vercel API rewrite.";
+export const HTML_API_RESPONSE_MESSAGE = "The API returned an HTML page instead of JSON. Check the same-origin API proxy.";
 
 function contentTypeOf(headers) {
     if (typeof headers?.get === "function") {
