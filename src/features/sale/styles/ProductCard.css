@@ -80,8 +80,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    border-left: 1px dotted #b45f0b;
+    width: 18px;
+    border-left: 1px solid #b45f0b;
     background: #f28c28;
     color: #ffffff;
     pointer-events: none;
@@ -90,7 +90,7 @@
 .offer-side-rail span {
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-    font-size: 8px;
+    font-size: 7px;
     font-weight: 800;
     letter-spacing: .05em;
     line-height: 1;
