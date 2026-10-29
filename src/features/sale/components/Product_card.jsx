@@ -126,10 +126,9 @@ function Product_card({ products = [], isLoading, error, page = 1, pageSize = 14
 
             return <article className="product_card" key={product.id} role="link" tabIndex={0} aria-label={`View ${product.name || "product"}`} onClick={openProduct} onKeyDown={openProductWithKeyboard}>
                 <div className="product_img">
-                    {(product.marketing_highlights?.length || (hasOffer && hasValue(product.discount_percentage))) ? (
+                    {product.marketing_highlights?.length ? (
                         <div className="product-image-topbar">
                             <ProductHighlightRail highlights={product.marketing_highlights} placement="badge" />
-                            {hasOffer && hasValue(product.discount_percentage) && <div className="offer-badge">{product.discount_percentage}% OFF</div>}
                         </div>
                     ) : null}
                     <div className="product-image-stage">
@@ -161,6 +160,7 @@ function Product_card({ products = [], isLoading, error, page = 1, pageSize = 14
                                 <span className={showOriginalPrice ? "new-price" : "price"}>
                                     <DirhamAmount value={displayPrice} fallback="Price unavailable" />
                                 </span>
+                                {hasOffer && showOriginalPrice && <span className="price-savings">Save {product.discount_percentage}%</span>}
                             </div>
                         </div>
                         <span className={`product-availability ${availability.toLowerCase().includes("out") ? "is-unavailable" : ""}`}>{availability}</span>

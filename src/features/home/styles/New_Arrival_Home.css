@@ -213,19 +213,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    border-left: 1px dotted color-mix(in srgb, var(--section-accent) 70%, #ffffff);
-    background: color-mix(in srgb, #ffffff 72%, transparent);
-    color: var(--section-accent);
+    width: 24px;
+    border-left: 1px dotted #b45f0b;
+    background: #f28c28;
+    color: #ffffff;
     pointer-events: none;
 }
 
 .offer-side-rail span {
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 800;
-    letter-spacing: .08em;
+    letter-spacing: .05em;
     line-height: 1;
     white-space: nowrap;
 }
@@ -261,12 +261,6 @@
     font-weight: 600;
     letter-spacing: 1px;
 }
-
-.badge-offer + .badge-new {
-    top: 49px;
-}
-
-
 
 /* Wishlist */
 
@@ -387,11 +381,13 @@
     margin: 10px 0;
     min-width: 0;
     min-height: 2.5em;
-    height: auto;
-    display: block;
+    height: 2.5em;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
+    overflow: hidden;
+    text-overflow: ellipsis;
     overflow-wrap: anywhere;
     word-break: normal;
     hyphens: auto;
@@ -466,7 +462,6 @@
     white-space: nowrap;
 }
 
-.product-image-topbar .badge-offer,
 .product-image-topbar .badge-new {
     position: static;
     margin: 0;
@@ -495,11 +490,11 @@
     display: inline-flex;
     align-items: center;
     align-self: flex-start;
-    width: fit-content;
+    width: 100%;
     max-width: 100%;
     box-sizing: border-box;
     min-width: 0;
-    min-height: 0;
+    min-height: 27px;
     margin-top: 0;
     padding: 6px 8px;
     border: 1px solid color-mix(in srgb, var(--product-message-bg, #EAF4FF) 72%, var(--section-accent));
@@ -516,8 +511,10 @@
 
 .product-message-label {
     min-width: 0;
-    overflow-wrap: anywhere;
-    white-space: normal;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 @keyframes product-message-in {
@@ -562,25 +559,17 @@
 
 }
 
-.badge-offer {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background: var(--section-accent);
-    color: #fff;
-    padding: 6px 14px;
-    border-radius: 50px;
-    font-size: 0.7rem;
-    font-family: Inter, Arial, Helvetica, sans-serif;
-    font-weight: 600;
-    letter-spacing: 1px;
-    z-index: 5;
-}
-
 .price-area{
     display:flex;
     flex-direction:column;
     gap:3px;
+}
+
+.price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 0;
 }
 
 .price-area .old-price{
@@ -596,6 +585,16 @@
     font-size: 18px;
     font-weight: 600;
     color: #203c46;
+}
+
+.price-savings {
+    flex: 0 0 auto;
+    color: #e26f16;
+    font-family: Inter, Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .02em;
+    white-space: nowrap;
 }
 
 /* Grid and View All Styles */
@@ -707,7 +706,7 @@
     .newHome-product-title {
         font-size: clamp(0.68rem, 3.4vw, 0.9rem);
         min-height: 2.5em;
-        height: auto;
+        height: 2.5em;
     }
 
     .price-area .product-price {

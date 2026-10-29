@@ -142,10 +142,9 @@ function New_Arrival_Home({
                             return (
                                 <article key={item.id} className="new-product-card">
                                     <div className="image-container" onClick={() => navigate(`/single/${item.id}`)} role="button" tabIndex={0} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") navigate(`/single/${item.id}`); }}>
-                                        {(item.marketing_highlights?.length || hasOffer || (showNewBadge && item.is_active)) ? (
+                                        {(item.marketing_highlights?.length || (showNewBadge && item.is_active)) ? (
                                             <div className="product-image-topbar">
                                                 <ProductHighlightRail highlights={item.marketing_highlights} placement="badge" />
-                                                {hasOffer && <span className="badge-offer">{discountPercentage}% OFF</span>}
                                                 {showNewBadge && item.is_active && <span className="badge-new">NEW</span>}
                                             </div>
                                         ) : null}
@@ -167,7 +166,10 @@ function New_Arrival_Home({
                                             <div className="product-meta">
                                                 <div className="price-area">
                                                     {originalPrice !== null && <span className="old-price"><DirhamAmount value={originalPrice} fallback="Price unavailable" /></span>}
-                                                    <span className="product-price"><DirhamAmount value={currentPrice} fallback="Price unavailable" /></span>
+                                                    <div className="price-row">
+                                                        <span className="product-price"><DirhamAmount value={currentPrice} fallback="Price unavailable" /></span>
+                                                        {hasOffer && <span className="price-savings">Save {discountPercentage}%</span>}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

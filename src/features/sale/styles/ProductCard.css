@@ -80,19 +80,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    border-left: 1px dotted rgba(31, 91, 62, .7);
-    background: rgba(255, 255, 255, .72);
-    color: #1F5B3E;
+    width: 24px;
+    border-left: 1px dotted #b45f0b;
+    background: #f28c28;
+    color: #ffffff;
     pointer-events: none;
 }
 
 .offer-side-rail span {
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 800;
-    letter-spacing: .08em;
+    letter-spacing: .05em;
     line-height: 1;
     white-space: nowrap;
 }
@@ -157,11 +157,6 @@
     overflow: visible;
     text-overflow: clip;
     white-space: nowrap;
-}
-
-.product-image-topbar .offer-badge {
-    position: static;
-    margin: 0;
 }
 
 /* .product_card:hover .product_img img {
@@ -300,10 +295,11 @@
     display: inline-flex;
     align-self: flex-start;
     align-items: center;
-    width: fit-content;
+    width: 100%;
     max-width: 100%;
     box-sizing: border-box;
     min-width: 0;
+    min-height: 27px;
     margin-top: 0;
     padding: 6px 8px;
     border: 1px solid color-mix(in srgb, var(--product-message-bg, #EAF4FF) 72%, #1F5B3E);
@@ -320,8 +316,10 @@
 
 .product-message-label {
     min-width: 0;
-    overflow-wrap: anywhere;
-    white-space: normal;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 @keyframes product-message-in {
@@ -337,6 +335,13 @@
     color: #2b2b2b;
     margin: 0 0 8px 0;
     line-height: 1.4;
+    min-height: 2.8em;
+    height: 2.8em;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
     overflow-wrap: anywhere;
     word-break: break-word;
 
@@ -426,21 +431,6 @@
     background: #eaeaea;
 }
 
-.offer-badge {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background: #1F5B3E;
-    color: #FFFFFF;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-family: Inter, Arial, Helvetica, sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    z-index: 5;
-    letter-spacing: .5px;
-}
-
 .price-box {
     display: flex;
     flex-direction: column;
@@ -461,6 +451,17 @@
     font-size: 17px;
     font-weight: 600;
     line-height: 1.2;
+}
+
+.price-box .price-savings {
+    display: block;
+    margin-top: 2px;
+    color: #e26f16;
+    font-family: Inter, Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .02em;
+    white-space: nowrap;
 }
 
 /* --- Skeleton Loading --- */
@@ -556,9 +557,11 @@
     .product-title{
         font-size: 12px;
         display: -webkit-box;
-        -webkit-line-clamp: 1;
+        -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
+        min-height: 2.8em;
+        height: 2.8em;
     }
 
     .shop-many-products,
@@ -573,16 +576,6 @@
         width: 25px;
         height: 25px;
 
-    }
-
-    .offer-badge {
-        background: #1F5B3E;
-        color: #FFFFFF;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 9px;
-        font-weight: 600;
-        letter-spacing: .5px;
     }
 
     .product_img .product-highlight-rail--badge {
