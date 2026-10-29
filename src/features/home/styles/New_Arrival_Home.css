@@ -318,14 +318,14 @@
     bottom: 12px;
     left: 50%;
     transform: translateX(-50%);
-    width: 76%;
-    padding: 10px 0;
+    width: 62%;
+    padding: 6px 0;
     border: none;
     border-radius: 50px;
     background: #1F5B3E;
     color: #fff;
     font-family: Inter, Arial, Helvetica, sans-serif;
-    font-size: 0.62rem;
+    font-size: 0.48rem;
     font-weight: 400;
     letter-spacing: 0.3px;
     opacity: 0;
@@ -744,9 +744,9 @@
 
     .quick-add-btn {
         bottom: 8px;
-        width: 70%;
-        padding: 7px 0;
-        font-size: 0.58rem;
+        width: 60%;
+        padding: 5px 0;
+        font-size: 0.48rem;
     }
 }
 .loading-container{

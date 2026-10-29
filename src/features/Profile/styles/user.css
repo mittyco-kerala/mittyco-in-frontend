@@ -117,6 +117,13 @@
     margin-bottom:45px;
 }
 
+.profile-side-stack{
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
 
 /* ===========================
    COMMON CARD
@@ -1150,15 +1157,11 @@ width:100%;
 
 .quick-links{
 
-    display:grid;
-
-    grid-template-columns:repeat(3,1fr);
-
-    gap:24px;
-
-    margin-top:45px;
-
-    margin-bottom:20px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:0;
+    margin-bottom:0;
 
 }
 
@@ -1170,13 +1173,13 @@ width:100%;
 
     border-radius:20px;
 
-    padding:28px 24px;
+    padding:16px 18px;
 
     display:flex;
 
     align-items:center;
 
-    gap:18px;
+    gap:12px;
 
     cursor:pointer;
 
@@ -1198,9 +1201,9 @@ width:100%;
 
 .quick-icon{
 
-    width:65px;
+    width:46px;
 
-    height:65px;
+    height:46px;
 
     border-radius:50%;
 
@@ -1214,7 +1217,7 @@ width:100%;
 
     color:#F4C430;
 
-    font-size:24px;
+    font-size:18px;
 
     transition:.3s;
 
@@ -1236,7 +1239,7 @@ width:100%;
 
     color:#1F5B3E;
 
-    font-size:19px;
+    font-size:16px;
 
     font-weight:600;
 
@@ -1248,7 +1251,7 @@ width:100%;
 
     color: #77907F;
 
-    font-size:14px;
+    font-size:12px;
 
     line-height:1.6;
 

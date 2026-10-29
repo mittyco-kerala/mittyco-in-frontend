@@ -490,6 +490,8 @@ const Profile = () => {
 
           </div>
 
+          <div className="profile-side-stack">
+
           <div className="default-address-card">
 
     <div className="card-header">
@@ -581,6 +583,36 @@ const Profile = () => {
     )}
 
 </div>
+
+        <div className="quick-links">
+
+          <div className="quick-card" onClick={() => navigate("/myorders")}>
+            <div className="quick-icon"><FaBoxOpen /></div>
+            <div>
+              <h3>My Orders</h3>
+              <p>Track your recent orders</p>
+            </div>
+          </div>
+
+          <div className="quick-card" onClick={() => navigate("/wishlist")}>
+            <div className="quick-icon"><FaHeart /></div>
+            <div>
+              <h3>Wishlist</h3>
+              <p>View your saved products</p>
+            </div>
+          </div>
+
+          <div className="quick-card logout-card" onClick={logout}>
+            <div className="quick-icon"><FaSignOutAlt /></div>
+            <div>
+              <h3>Logout</h3>
+              <p>Sign out from your account</p>
+            </div>
+          </div>
+
+        </div>
+
+        </div>
 
         </div>
 
@@ -910,95 +942,6 @@ const Profile = () => {
           </div>
 
         )}
-        <div className="quick-links">
-
-          <div className="quick-card"
-            onClick={() => navigate("/myorders")}
-          >
-
-            <div className="quick-icon">
-
-              <FaBoxOpen />
-
-            </div>
-
-            <div>
-
-              <h3>
-
-                My Orders
-
-              </h3>
-
-              <p>
-
-                Track your recent orders
-
-              </p>
-
-            </div>
-
-          </div>
-
-          <div className="quick-card"
-            onClick={() => navigate("/wishlist")}
-          >
-
-            <div className="quick-icon">
-
-              <FaHeart />
-
-            </div>
-
-            <div>
-
-              <h3>
-
-                Wishlist
-
-              </h3>
-
-              <p>
-
-                View your saved products
-
-              </p>
-
-            </div>
-
-          </div>
-
-          <div
-            className="quick-card logout-card"
-            onClick={logout}
-          >
-
-            <div className="quick-icon">
-
-              <FaSignOutAlt />
-
-            </div>
-
-            <div>
-
-              <h3>
-
-                Logout
-
-              </h3>
-
-              <p>
-
-                Sign out from your account
-
-              </p>
-
-            </div>
-
-          </div>
-
-        </div>
-
       </div>
 
     </div>
