@@ -11,6 +11,7 @@ import { hasAuthSession } from "../../auth/authUtils";
 import DirhamAmount from "../../../components/DirhamAmount";
 import ProductHighlightRail from "../../home/components/ProductHighlightRail";
 import ProductMessageRail from "../../home/components/ProductMessageRail";
+import OfferSideRail from "../../home/components/OfferSideRail";
 
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
 
@@ -144,23 +145,26 @@ function Product_card({ products = [], isLoading, error, page = 1, pageSize = 14
                             VIEW PRODUCT
                         </button>
                     </div>
+                    {hasOffer && <OfferSideRail percentage={product.discount_percentage} />}
                     <button className={`favorite_btn ${isWishlisted ? "active" : ""}`} onClick={(event) => addToWishlist(product, event)} aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}><FaHeart /></button>
                 </div>
                 <div className="product_info">
                     <span className="product-category">{product.category?.name || product.brand?.name || ""}</span>
                     <h3 className="product-title">{product.name}</h3>
-                    <div className="product-footer">
-                        <div className="price-box">
-                            {showOriginalPrice ? (
-                                <span className="old-price"><DirhamAmount value={originalPrice} fallback="Price unavailable" /></span>
-                            ) : null}
-                            <span className={showOriginalPrice ? "new-price" : "price"}>
-                                <DirhamAmount value={displayPrice} fallback="Price unavailable" />
-                            </span>
+                    <div className="product-details-bottom">
+                        <ProductMessageRail messages={product.product_messages} />
+                        <div className="product-footer">
+                            <div className="price-box">
+                                {showOriginalPrice ? (
+                                    <span className="old-price"><DirhamAmount value={originalPrice} fallback="Price unavailable" /></span>
+                                ) : null}
+                                <span className={showOriginalPrice ? "new-price" : "price"}>
+                                    <DirhamAmount value={displayPrice} fallback="Price unavailable" />
+                                </span>
+                            </div>
                         </div>
+                        <span className={`product-availability ${availability.toLowerCase().includes("out") ? "is-unavailable" : ""}`}>{availability}</span>
                     </div>
-                    <ProductMessageRail messages={product.product_messages} />
-                    <span className={`product-availability ${availability.toLowerCase().includes("out") ? "is-unavailable" : ""}`}>{availability}</span>
                 </div>
             </article>;
         })}

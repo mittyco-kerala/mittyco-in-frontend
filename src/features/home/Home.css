@@ -353,6 +353,7 @@
 .homepage-product-catalog .product_info {
     padding: 14px 4px 0;
     flex: 1;
+    min-height: 0;
 }
 
 .homepage-product-catalog .product-title {

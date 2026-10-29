@@ -13,6 +13,7 @@ import DirhamAmount from "../../../components/DirhamAmount";
 import { getHomepageProductPricing } from "../utils/productPricing";
 import ProductHighlightRail from "./ProductHighlightRail";
 import ProductMessageRail from "./ProductMessageRail";
+import OfferSideRail from "./OfferSideRail";
 
 const MAX_PRODUCTS_PER_SECTION = 16;
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
@@ -152,6 +153,7 @@ function New_Arrival_Home({
                                             <img src={image ? getImageUrl(image) : undefined} alt={item.name} className="product-img" />
                                             <button type="button" className="quick-add-btn" onClick={(event) => { event.stopPropagation(); navigate(`/single/${item.id}`); }}>VIEW PRODUCT</button>
                                         </div>
+                                        {hasOffer && <OfferSideRail percentage={discountPercentage} />}
                                         <button type="button" className={`wishlist-btn ${isWishlisted ? "is-wishlisted" : ""}`} onClick={(event) => addToWishlist(item, event)} aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}>{isWishlisted ? <FaHeart className="heart-icon" /> : <FaRegHeart className="heart-icon" />}</button>
                                     </div>
 
@@ -160,13 +162,15 @@ function New_Arrival_Home({
                                         <h3 className="newHome-product-title" title={item.name || "Product"}>
                                             {item.name || item.description || "Product"}
                                         </h3>
-                                        <div className="product-meta">
-                                            <div className="price-area">
-                                                {originalPrice !== null && <span className="old-price"><DirhamAmount value={originalPrice} fallback="Price unavailable" /></span>}
-                                                <span className="product-price"><DirhamAmount value={currentPrice} fallback="Price unavailable" /></span>
+                                        <div className="product-details-bottom">
+                                            <ProductMessageRail messages={item.product_messages} />
+                                            <div className="product-meta">
+                                                <div className="price-area">
+                                                    {originalPrice !== null && <span className="old-price"><DirhamAmount value={originalPrice} fallback="Price unavailable" /></span>}
+                                                    <span className="product-price"><DirhamAmount value={currentPrice} fallback="Price unavailable" /></span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <ProductMessageRail messages={item.product_messages} />
                                     </div>
                                 </article>
                             );
