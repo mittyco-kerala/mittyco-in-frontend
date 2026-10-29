@@ -198,6 +198,28 @@
 
 }
 
+.profile-edit-link{
+    margin-left:auto;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    border:1px solid #dfe7e2;
+    border-radius:999px;
+    padding:8px 13px;
+    background:#ffffff;
+    color:#1F5B3E;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.2s ease;
+}
+
+.profile-edit-link:hover,
+.profile-edit-link:focus-visible{
+    border-color:#1F5B3E;
+    background:#f4f8f5;
+}
+
 
 /* ===========================
    PROFILE FORM
@@ -278,6 +300,21 @@
 .profile-form.is-editing input[readonly] {
     background: #f2f4f1;
     color: #7b8588;
+}
+
+.profile-form.is-readonly .input-group input,
+.profile-form.is-readonly .input-group select{
+    height:auto;
+    min-height:0;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+    color:#1F5B3E;
+    font-size:16px;
+    font-weight:600;
+    cursor:default;
 }
 
 .profile-form select:disabled {
@@ -1267,6 +1304,14 @@ width:100%;
 
     background:#F4C430;
 
+}
+
+.profile-logout-links{
+    margin-top:28px;
+}
+
+.profile-logout-links .quick-card{
+    width:100%;
 }
 .default-address-card{
     background: #FBFAF4;

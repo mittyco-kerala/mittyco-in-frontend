@@ -340,6 +340,17 @@ const Profile = () => {
 
               </h3>
 
+              {!isEditingProfile && (
+                <button
+                  type="button"
+                  className="profile-edit-link"
+                  onClick={() => setIsEditingProfile(true)}
+                >
+                  <FaEdit aria-hidden="true" />
+                  Edit
+                </button>
+              )}
+
             </div>
 
             <form
@@ -465,32 +476,39 @@ const Profile = () => {
 
               </div>
 
-              <button
-                type={isEditingProfile ? "submit" : "button"}
-                className={`save-profile-btn ${!isEditingProfile ? "edit-profile-btn" : ""}`}
-                onClick={!isEditingProfile ? () => setIsEditingProfile(true) : undefined}
-                disabled={loading}
-              >
-
-                {loading ?
-
-                  "Saving..."
-
-                  : isEditingProfile ?
-
-                  "Save Changes"
-
-                  :
-
-                  <><FaEdit aria-hidden="true" /> Edit</>}
-
-              </button>
+              {isEditingProfile && (
+                <button
+                  type="submit"
+                  className="save-profile-btn"
+                  disabled={loading}
+                >
+                  {loading ? "Saving..." : "Save Changes"}
+                </button>
+              )}
 
             </form>
 
           </div>
 
           <div className="profile-side-stack">
+
+          <div className="quick-links">
+            <div className="quick-card" onClick={() => navigate("/myorders")}>
+              <div className="quick-icon"><FaBoxOpen /></div>
+              <div>
+                <h3>My Orders</h3>
+                <p>Track your recent orders</p>
+              </div>
+            </div>
+
+            <div className="quick-card" onClick={() => navigate("/wishlist")}>
+              <div className="quick-icon"><FaHeart /></div>
+              <div>
+                <h3>Wishlist</h3>
+                <p>View your saved products</p>
+              </div>
+            </div>
+          </div>
 
           <div className="default-address-card">
 
@@ -583,34 +601,6 @@ const Profile = () => {
     )}
 
 </div>
-
-        <div className="quick-links">
-
-          <div className="quick-card" onClick={() => navigate("/myorders")}>
-            <div className="quick-icon"><FaBoxOpen /></div>
-            <div>
-              <h3>My Orders</h3>
-              <p>Track your recent orders</p>
-            </div>
-          </div>
-
-          <div className="quick-card" onClick={() => navigate("/wishlist")}>
-            <div className="quick-icon"><FaHeart /></div>
-            <div>
-              <h3>Wishlist</h3>
-              <p>View your saved products</p>
-            </div>
-          </div>
-
-          <div className="quick-card logout-card" onClick={logout}>
-            <div className="quick-icon"><FaSignOutAlt /></div>
-            <div>
-              <h3>Logout</h3>
-              <p>Sign out from your account</p>
-            </div>
-          </div>
-
-        </div>
 
         </div>
 
@@ -942,6 +932,16 @@ const Profile = () => {
           </div>
 
         )}
+
+        <div className="quick-links profile-logout-links">
+          <div className="quick-card logout-card" onClick={logout}>
+            <div className="quick-icon"><FaSignOutAlt /></div>
+            <div>
+              <h3>Logout</h3>
+              <p>Sign out from your account</p>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
