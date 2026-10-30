@@ -13,3 +13,6 @@
 @media(max-width:760px){.unit-editor-row{grid-template-columns:1fr 1fr}.unit-editor-row .table-icon{justify-self:end}.variant-editor>.admin-form-field{max-width:none}}
 .table-copy-button { display: inline-flex; align-items: center; gap: 5px; border: 1px solid #cfded9; border-radius: 6px; background: #f3f8f6; color: #365b61; padding: 5px 8px; cursor: pointer; font-size: 12px; }
 .table-image-thumb { width: 56px; height: 38px; display: block; object-fit: cover; border-radius: 6px; border: 1px solid var(--admin-line); background: #f4f7f5; }
+.order-detail-actions{display:flex;align-items:center;justify-content:flex-end;gap:9px}.order-detail-actions .admin-button{min-height:40px}
+.admin-table-select{width:42px;text-align:center!important}.admin-table-select input{width:17px;height:17px;accent-color:var(--admin-brand);cursor:pointer}
+@media(max-width:760px){.order-detail-actions{width:100%;flex-direction:column}.order-detail-actions .admin-button{width:100%}}

@@ -21,6 +21,7 @@ import ForgotPassword from '../features/auth/page/ForgotPassord'
 import ResetPassword from '../features/auth/page/ResetPassword'
 import Checkout from '../features/cart/page/CheckOut'
 import Invoice from '../features/Dasboard/page/InvoicePrint'
+import PackagingSlip from '../features/Dasboard/page/PackagingSlip'
 import ProtectedRoute from '../features/auth/page/ProtectedRoute'
 import Unauthorized from '../features/auth/page/Unauthorized'
 function LegacyOrderDetailsRedirect() {
@@ -73,6 +74,11 @@ function Router() {
                 <Route path='myorders' element={
                     <ProtectedRoute>
                         <MyOrder />
+                    </ProtectedRoute>
+                } />
+                <Route path='myorders/:id/invoice' element={
+                    <ProtectedRoute>
+                        <Invoice />
                     </ProtectedRoute>
                 } />
 
@@ -139,6 +145,22 @@ function Router() {
                     element={
                         <AdminRoute>
                             <Invoice />
+                        </AdminRoute>
+                    }
+                />
+                <Route
+                    path="/mittyco-dashboard/packaging-slip"
+                    element={
+                        <AdminRoute>
+                            <PackagingSlip />
+                        </AdminRoute>
+                    }
+                />
+                <Route
+                    path="/mittyco-dashboard/packaging-slip/:id"
+                    element={
+                        <AdminRoute>
+                            <PackagingSlip />
                         </AdminRoute>
                     }
                 />

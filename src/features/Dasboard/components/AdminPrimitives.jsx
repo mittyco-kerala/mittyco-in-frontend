@@ -71,11 +71,14 @@ export function Modal({ children, title, onClose, wide = false }) {
     </div>;
 }
 
-export function DataTable({ columns, rows, loading, error, onRetry, onRowClick, actions }) {
+export function DataTable({ columns, rows, loading, error, onRetry, onRowClick, actions, selectable = false, selectedIds = new Set(), onToggleSelect, onToggleSelectAll }) {
     if (loading) return <TableSkeleton columns={columns.length + (actions ? 1 : 0)} />;
     if (error) return <ErrorState message={error} onRetry={onRetry} />;
     if (!rows.length) return <EmptyState />;
-    return <div className="admin-table-wrap"><table className="admin-table"><caption className="sr-only">Dashboard records</caption><thead><tr>{columns.map((column) => <th scope="col" key={column.key}>{column.label}</th>)}{actions && <th scope="col">Actions</th>}</tr></thead><tbody>{rows.map((row) => <tr key={row.id ?? row.pk ?? row.uuid} onClick={() => onRowClick?.(row)} tabIndex={onRowClick ? 0 : undefined} onKeyDown={(event) => { if (onRowClick && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); onRowClick(row); } }}>{columns.map((column) => <td key={column.key}>{column.render ? column.render(row) : formatCell(row[column.key])}</td>)}{actions && <td onClick={(event) => event.stopPropagation()}><div className="table-actions">{actions(row)}</div></td>}</tr>)}</tbody></table></div>;
+    const rowId = (row) => String(row.id ?? row.pk ?? row.uuid);
+    const isSelected = (row) => selectedIds instanceof Set ? selectedIds.has(rowId(row)) : selectedIds.includes(rowId(row));
+    const allSelected = selectable && rows.every((row) => isSelected(row));
+    return <div className="admin-table-wrap"><table className="admin-table"><caption className="sr-only">Dashboard records</caption><thead><tr>{selectable && <th scope="col" className="admin-table-select"><input type="checkbox" aria-label="Select all visible records" checked={allSelected} onChange={() => onToggleSelectAll?.(rows)} /></th>}{columns.map((column) => <th scope="col" key={column.key}>{column.label}</th>)}{actions && <th scope="col">Actions</th>}</tr></thead><tbody>{rows.map((row) => <tr key={rowId(row)} onClick={() => onRowClick?.(row)} tabIndex={onRowClick ? 0 : undefined} onKeyDown={(event) => { if (onRowClick && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); onRowClick(row); } }}>{selectable && <td className="admin-table-select" onClick={(event) => event.stopPropagation()}><input type="checkbox" aria-label={`Select record ${rowId(row)}`} checked={isSelected(row)} onChange={() => onToggleSelect?.(row)} /></td>}{columns.map((column) => <td key={column.key}>{column.render ? column.render(row) : formatCell(row[column.key])}</td>)}{actions && <td onClick={(event) => event.stopPropagation()}><div className="table-actions">{actions(row)}</div></td>}</tr>)}</tbody></table></div>;
 }
 
 function formatCell(value) {

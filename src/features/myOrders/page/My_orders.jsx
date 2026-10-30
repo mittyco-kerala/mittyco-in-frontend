@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import client from "../../../lib/ApiClient";
 import "../styles/Myorders.css";
 import { getImageUrl } from "../../../utils/imageUrl";
@@ -6,17 +7,13 @@ import DirhamAmount from "../../../components/DirhamAmount";
 
 const MyOrders = () => {
 
+    const navigate = useNavigate();
+
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    useEffect(() => {
-
-        fetchOrders();
-
-    }, []);
-
-    const fetchOrders = async () => {
+    const fetchOrders = useCallback(async () => {
 
         try {
 
@@ -48,7 +45,15 @@ const MyOrders = () => {
 
         }
 
-    };
+    }, []);
+
+    useEffect(() => {
+
+        // The request updates loading/error state after the external API call.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchOrders();
+
+    }, [fetchOrders]);
 
 
     const getStatusClass = (status) => {
@@ -371,16 +376,29 @@ const MyOrders = () => {
                                 </div>
 
 
-                                <div className="order-total">
+                                <div className="order-card-actions">
 
-                                    <span>
-                                        Order Total
-                                    </span>
+                                    {order.invoice && (
+                                        <button
+                                            type="button"
+                                            className="order-invoice-button"
+                                            onClick={() => navigate(`/myorders/${order.id}/invoice`)}
+                                        >
+                                            View invoice
+                                        </button>
+                                    )}
 
-                                    <strong>
-                                        <DirhamAmount value={order.total_amount || 0} />
-                                    </strong>
+                                    <div className="order-total">
 
+                                        <span>
+                                            Order Total
+                                        </span>
+
+                                        <strong>
+                                            <DirhamAmount value={order.total_amount || 0} />
+                                        </strong>
+
+                                    </div>
                                 </div>
 
                             </footer>

@@ -311,6 +311,30 @@
     font-size:13px;
 }
 
+.order-card-actions{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin-left:auto;
+}
+
+.order-invoice-button{
+    padding:9px 14px;
+    border:1px solid #1F5B3E;
+    border-radius:6px;
+    background:transparent;
+    color:#1F5B3E;
+    font-family:inherit;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.order-invoice-button:hover{
+    background:#1F5B3E;
+    color:#FFFFFF;
+}
+
 .order-total{
     display:flex;
     align-items:center;
@@ -618,6 +642,7 @@
         min-height:52px;
         padding:10px 12px;
         gap:10px;
+        flex-wrap:wrap;
     }
 
     .order-items-total{
@@ -634,6 +659,15 @@
 
     .order-total strong{
         font-size:13px;
+    }
+
+    .order-card-actions{
+        gap:8px;
+    }
+
+    .order-invoice-button{
+        padding:7px 9px;
+        font-size:10px;
     }
 
 }

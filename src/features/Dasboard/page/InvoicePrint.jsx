@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import client from "../../../lib/ApiClient";
 import "../styles/Invoice.css";
 import { getImageUrl } from "../../../utils/imageUrl";
@@ -11,25 +11,22 @@ const Invoice = () => {
 
     const navigate = useNavigate();
 
+    const location = useLocation();
+
+    const isCustomerInvoice = !location.pathname.startsWith("/mittyco-dashboard");
+
     const [order, setOrder] = useState(null);
 
     const [loading, setLoading] = useState(true);
 
     const [error, setError] = useState("");
 
-    useEffect(() => {
-
-        fetchOrder();
-
-
-    }, []);
-
-    const fetchOrder = async () => {
+    const fetchOrder = useCallback(async () => {
 
         try {
 
             const response = await client.get(
-                `/admin-order-details/${id}/`
+                isCustomerInvoice ? `/order-details/${id}/` : `/admin-order-details/${id}/`
             );
 
 
@@ -48,7 +45,16 @@ const Invoice = () => {
 
         }
 
-    };
+    }, [id, isCustomerInvoice]);
+
+    useEffect(() => {
+
+        // The request updates loading/error state after the external API call.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchOrder();
+
+
+    }, [fetchOrder]);
 
     const handlePrint = () => {
 
@@ -76,6 +82,18 @@ const Invoice = () => {
             <div className="invoice-page">
                 <div className="invoice-error">
                     {error}
+                </div>
+            </div>
+        );
+
+    }
+
+    if (!order.invoice) {
+
+        return (
+            <div className="invoice-page">
+                <div className="invoice-error">
+                    This invoice will be available after the payment is confirmed.
                 </div>
             </div>
         );
@@ -137,7 +155,7 @@ const Invoice = () => {
                             </span>
 
                             <strong>
-                                INV-{String(order.id).padStart(3, "0")}
+                                {order.invoice.invoice_number}
                             </strong>
 
                         </div>
@@ -162,7 +180,7 @@ const Invoice = () => {
 
                             <strong>
                                 {new Date(
-                                    order.created_at
+                                    order.invoice.issued_at || order.created_at
                                 ).toLocaleDateString()}
                             </strong>
 
