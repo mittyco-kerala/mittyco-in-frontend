@@ -23,11 +23,34 @@ const Checkout = () => {
         total: 0,
         discount: 0,
     });
+    const [shippingQuote, setShippingQuote] = useState(null);
 
     const [loading, setLoading] = useState(true);
     const [processing, setProcessing] = useState(false);
     const [checkoutError, setCheckoutError] = useState("");
     const [paymentMethod, setPaymentMethod] = useState("RAZORPAY");
+
+    const fetchShippingQuote = useCallback(async (addressId) => {
+        if (!addressId) return null;
+        try {
+            const response = await client.get("shipping/quote/", {
+                params: { address: addressId },
+                timeout: ORDER_REQUEST_TIMEOUT,
+            });
+            const quote = response.data || {};
+            setShippingQuote(quote);
+            setCartSummary((current) => ({
+                ...current,
+                shipping: Number(quote.shipping || 0),
+                total: Number(quote.total || current.total || 0),
+            }));
+            return quote;
+        } catch (error) {
+            setShippingQuote(null);
+            setCheckoutError(error.response?.data?.message || "Could not calculate India Post delivery charge.");
+            return null;
+        }
+    }, []);
 
     const fetchAddresses = useCallback(async () => {
 
@@ -37,15 +60,14 @@ const Checkout = () => {
 
             setAddresses(response.data);
 
-            if (response.data.length > 0) {
-
-                setSelectedAddress(response.data[0].id);
-
-            }
+            const firstAddressId = response.data[0]?.id || null;
+            if (firstAddressId) setSelectedAddress(firstAddressId);
+            return firstAddressId;
 
         } catch (error) {
 
             console.log(error);
+            return null;
 
         }
 
@@ -84,16 +106,17 @@ const Checkout = () => {
 
     useEffect(() => {
         const loadCheckout = async () => {
-            await Promise.all([
+            const [firstAddressId] = await Promise.all([
                 fetchAddresses(),
                 fetchCart()
             ]);
+            if (firstAddressId) await fetchShippingQuote(firstAddressId);
 
             setLoading(false);
         };
 
         loadCheckout();
-    }, [fetchAddresses, fetchCart]);
+    }, [fetchAddresses, fetchCart, fetchShippingQuote]);
 
     const placeOrder = async () => {
 
@@ -114,6 +137,12 @@ const Checkout = () => {
 
             const latestCart = await fetchCart();
             if (!latestCart) {
+                setProcessing(false);
+                return;
+            }
+
+            const latestShippingQuote = await fetchShippingQuote(selectedAddress);
+            if (!latestShippingQuote) {
                 setProcessing(false);
                 return;
             }
@@ -285,9 +314,10 @@ const Checkout = () => {
                                                 ? "active"
                                                 : ""
                                         }`}
-                                        onClick={() =>
-                                            setSelectedAddress(address.id)
-                                        }
+                                        onClick={() => {
+                                            setSelectedAddress(address.id);
+                                            fetchShippingQuote(address.id);
+                                        }}
                                     >
 
                                         <input
@@ -295,9 +325,10 @@ const Checkout = () => {
                                             checked={
                                                 selectedAddress === address.id
                                             }
-                                            onChange={() =>
-                                                setSelectedAddress(address.id)
-                                            }
+                                            onChange={() => {
+                                                setSelectedAddress(address.id);
+                                                fetchShippingQuote(address.id);
+                                            }}
                                         />
 
                                         <div className="mittyco-address-info">
@@ -530,6 +561,12 @@ const Checkout = () => {
                                     }
 
                                 </span>
+
+                                {shippingQuote?.weight_grams ? (
+                                    <small>
+                                        India Post · {shippingQuote.weight_grams} g
+                                    </small>
+                                ) : null}
 
                             </div>
 
