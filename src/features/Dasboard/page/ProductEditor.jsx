@@ -133,9 +133,6 @@ export default function ProductEditor({ readOnly = false }) {
     }));
     const addVariant = () => setVariants((current) => [...current, emptyVariant(id || "")]);
     const updateVariant = (index, name, value) => {
-        if (name === "color" && !value && variants.some((variant, variantIndex) => variantIndex !== index && !variant.color)) {
-            setFieldErrors((current) => ({ ...current, [`variant_${index}_color`]: "A product can have only one variant without a color." })); return;
-        }
         setFieldErrors((current) => { const next = { ...current }; delete next[`variant_${index}_${name}`]; return next; });
         setVariants((current) => current.map((variant, variantIndex) => variantIndex === index ? { ...variant, [name]: value } : variant));
     };
@@ -155,9 +152,7 @@ export default function ProductEditor({ readOnly = false }) {
         const subcategory = dropdowns.subcategories.find((item) => String(item.value) === String(product.subcategory));
         if (subcategory && String(subcategory.category) !== String(product.category)) errors.subcategory = "The subcategory must belong to the selected category.";
         if (product.related_product_mode === "manual" && selectedRelatedIds.length > 4) errors.related_product_ids = "Choose no more than four related products.";
-        const colorlessIndexes = [];
         variants.forEach((variant, index) => {
-            if (!variant.color) colorlessIndexes.push(index);
             if (variant.price_type === "single") {
                 if (variant.price === "" || !Number.isFinite(Number(variant.price)) || Number(variant.price) <= 0) errors[`variant_${index}_price`] = "A single-price variant requires a positive price.";
                 if (variant.stock === "" || !Number.isFinite(Number(variant.stock)) || Number(variant.stock) < 0) errors[`variant_${index}_stock`] = "Stock is required and cannot be negative.";
@@ -172,7 +167,6 @@ export default function ProductEditor({ readOnly = false }) {
                 });
             }
         });
-        if (colorlessIndexes.length > 1) { errors.variant_colorless = "A product can have only one variant without a color."; colorlessIndexes.slice(1).forEach((index) => { errors[`variant_${index}_color`] = errors.variant_colorless; }); }
         return errors;
     };
 
