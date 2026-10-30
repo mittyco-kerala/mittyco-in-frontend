@@ -442,11 +442,13 @@ function Single_product() {
         sizeId
     ]);
 
-    const availableSizes =
-        selectedVariant?.sizes || [];
+    const colorlessVariants = (data?.variants || []).filter((variant) => !variant.color);
+    const availableSizes = colors.length === 0
+        ? colorlessVariants.flatMap((variant) => (variant.sizes || []).map((item) => ({ ...item, __variantId: variant.id })))
+        : (selectedVariant?.sizes || []);
 
     const selectedSizeVariant =
-        selectedVariant?.sizes?.find(
+        availableSizes.find(
             item =>
                 (item.unit?.id === selectedSize?.id) || (item.size?.id === selectedSize?.id)
         );
@@ -743,33 +745,9 @@ function Single_product() {
                         </div>
                     </div>}
 
-                    {colors.length === 0 && data?.variants?.length > 1 && (
-                        <div className="option-block variant-selection-block">
-                            <h4>Variant: <span className="selected-option-label">{selectedVariant?.sku || `Variant ${data.variants.findIndex((item) => item.id === selectedVariant?.id) + 1}`}</span></h4>
-                            <div className="sizes">
-                                {data.variants.map((variant, index) => (
-                                    <button
-                                        type="button"
-                                        key={variant.id || index}
-                                        className={selectedVariant?.id === variant.id ? "size-btn active-size" : "size-btn"}
-                                        onClick={() => {
-                                            setSelectedVariantId(variant.id);
-                                            setSelectedColor(variant.color || null);
-                                            setSelectedSize(null);
-                                            const image = variant.images?.find((img) => img.is_primary) || variant.images?.[0];
-                                            setActiveImage(image?.image || null);
-                                        }}
-                                    >
-                                        {variant.sku || `Variant ${index + 1}`}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {selectedVariant?.price_type === 'multiple' && availableSizes?.some(item => item.unit || item.size) && (
+                    {availableSizes?.some(item => item.unit || item.size) && (
                         <div className="option-block">
-                            <h4>{availableSizes?.[0]?.unit_type?.name || availableSizes?.[0]?.size?.unit_type || selectedSize?.unit_type || "Variant Option"}: <span className="selected-option-label">{selectedSize?.name}</span></h4>
+                            <h4>Unit: <span className="selected-option-label">{selectedSize?.name}</span></h4>
                             <div className="sizes">
                                 {availableSizes.map((item) => {
                                     const unitObj = item.unit || item.size;
@@ -777,7 +755,16 @@ function Single_product() {
                                         <button
                                             key={item.id}
                                             className={selectedSize?.id === unitObj.id ? "size-btn active-size" : "size-btn"}
-                                            onClick={() => setSelectedSize(unitObj)}
+                                            onClick={() => {
+                                                if (item.__variantId && String(item.__variantId) !== String(selectedVariant?.id)) {
+                                                    const unitVariant = data.variants.find((variant) => String(variant.id) === String(item.__variantId));
+                                                    setSelectedVariantId(item.__variantId);
+                                                    setSelectedColor(unitVariant?.color || null);
+                                                    const image = unitVariant?.images?.find((img) => img.is_primary) || unitVariant?.images?.[0];
+                                                    setActiveImage(image?.image || null);
+                                                }
+                                                setSelectedSize(unitObj);
+                                            }}
                                         >
                                             {unitObj.name}
                                         </button>
