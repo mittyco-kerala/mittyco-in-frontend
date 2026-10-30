@@ -1,5 +1,5 @@
 export const PAYMENT_MESSAGES = {
-    invalidSession: "Payment is incomplete or this Cashfree payment order is invalid.",
+    invalidSession: "Payment is incomplete or this payment order is invalid.",
     refunded: "Payment was refunded because the item could not be fulfilled.",
     unauthorized: "You are not authorized to access this payment order.",
     support: "We could not verify your payment. Please contact support before trying again.",

@@ -32,17 +32,19 @@ const PaymentSuccess = () => {
         };
 
         const verifyPayment = async () => {
-            const cashfreeOrderId = searchParams.get("order_id");
+            const provider = searchParams.get("provider");
+            const paymentOrderId = searchParams.get("order_id");
 
-            if (!cashfreeOrderId) {
+            if (!paymentOrderId) {
                 showFailure({ message: PAYMENT_MESSAGES.invalidSession, title: "Payment Not Completed" });
                 return;
             }
 
             try {
-                const response = await client.get("payment/cashfree-success/", {
-                    params: { order_id: cashfreeOrderId },
-                });
+                const response = await client.get(
+                    provider === "razorpay" ? "payment/razorpay-success/" : "payment/cashfree-success/",
+                    { params: { order_id: paymentOrderId } }
+                );
 
                 if (response.status !== 200) {
                     showFailure({ message: PAYMENT_MESSAGES.generic, title: "Payment Not Confirmed" });

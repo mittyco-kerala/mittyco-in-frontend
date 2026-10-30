@@ -7,6 +7,7 @@ import showToast from "../../../utils/toast";
 import { clearCouponApplication, isInactiveCouponError } from "../../coupon/couponState";
 import DirhamAmount from "../../../components/DirhamAmount";
 import { WHATSAPP_NUMBER } from "../../../config/contact";
+import { loadRazorpayCheckout } from "../../../lib/razorpay";
 
 const Checkout = () => {
 
@@ -158,9 +159,65 @@ const Checkout = () => {
                 return;
             }
 
+            const idempotencyKey = crypto.randomUUID();
+
+            if (paymentMethod === "RAZORPAY") {
+                const Razorpay = await loadRazorpayCheckout();
+                const response = await client.post(
+                    "payment/create-razorpay-order/",
+                    { address: selectedAddress },
+                    {
+                        timeout: ORDER_REQUEST_TIMEOUT,
+                        headers: { "Idempotency-Key": idempotencyKey },
+                    },
+                );
+                const checkout = response.data || {};
+                if (!checkout.razorpay_order_id || !checkout.key_id || !checkout.amount) {
+                    throw new Error("Razorpay checkout could not be started.");
+                }
+
+                await new Promise((resolve, reject) => {
+                    let settled = false;
+                    const finish = (callback, value) => {
+                        if (settled) return;
+                        settled = true;
+                        callback(value);
+                    };
+                    const razorpay = new Razorpay({
+                        key: checkout.key_id,
+                        amount: checkout.amount,
+                        currency: checkout.currency,
+                        name: checkout.name || "Mittyco",
+                        description: checkout.description || "Mittyco online order",
+                        order_id: checkout.razorpay_order_id,
+                        prefill: checkout.prefill,
+                        theme: checkout.theme,
+                        modal: { ondismiss: () => finish(reject, new Error("Payment was cancelled.")) },
+                        handler: async (paymentResponse) => {
+                            try {
+                                const verification = await client.post(
+                                    "payment/verify-razorpay-payment/",
+                                    paymentResponse,
+                                    { timeout: ORDER_REQUEST_TIMEOUT },
+                                );
+                                finish(resolve, verification.data);
+                            } catch (verificationError) {
+                                finish(reject, verificationError);
+                            }
+                        },
+                    });
+                    razorpay.on("payment.failed", () => finish(reject, new Error("Razorpay payment failed.")));
+                    razorpay.open();
+                });
+
+                showToast.success("Razorpay test payment successful. Order placed.");
+                setProcessing(false);
+                navigate(`/payment-success?provider=razorpay&order_id=${encodeURIComponent(response.data?.razorpay_order_id || checkout.razorpay_order_id)}`);
+                return;
+            }
+
             // A failed checkout attempt must never reuse a key: each button
             // click represents a new user-initiated checkout operation.
-            const idempotencyKey = crypto.randomUUID();
             const response = await client.post(
                 "place-order/",
                 {
@@ -380,7 +437,7 @@ const Checkout = () => {
 
                             <p>
 
-                                Online payments are temporarily unavailable. Choose Cash on Delivery or continue through WhatsApp.
+                                Choose a payment method. Razorpay is currently in test mode.
 
                             </p>
 
@@ -395,6 +452,20 @@ const Checkout = () => {
                                 <span>
                                     <strong>Cash on Delivery (COD)</strong>
                                     <small>Pay in cash when your order is delivered.</small>
+                                </span>
+                            </label>
+
+                            <label className={`mittyco-payment-option ${paymentMethod === "RAZORPAY" ? "active" : ""}`}>
+                                <input
+                                    type="radio"
+                                    name="payment-method"
+                                    value="RAZORPAY"
+                                    checked={paymentMethod === "RAZORPAY"}
+                                    onChange={() => setPaymentMethod("RAZORPAY")}
+                                />
+                                <span>
+                                    <strong>Pay online with Razorpay</strong>
+                                    <small>Test mode only — no real money is charged.</small>
                                 </span>
                             </label>
 
@@ -622,7 +693,11 @@ const Checkout = () => {
 
                                     :
 
-                                    paymentMethod === "WHATSAPP" ? "Continue via WhatsApp" : "Place COD Order"
+                                    paymentMethod === "WHATSAPP"
+                                        ? "Continue via WhatsApp"
+                                        : paymentMethod === "RAZORPAY"
+                                            ? "Pay with Razorpay (Test)"
+                                            : "Place COD Order"
 
                             }
 
@@ -632,7 +707,9 @@ const Checkout = () => {
 
                             {paymentMethod === "WHATSAPP"
                                 ? "Your order details will open in WhatsApp for confirmation."
-                                : "Payment will be collected in cash when your order is delivered."}
+                                : paymentMethod === "RAZORPAY"
+                                    ? "Use Razorpay test credentials to complete a simulated payment."
+                                    : "Payment will be collected in cash when your order is delivered."}
 
                         </p>
 
