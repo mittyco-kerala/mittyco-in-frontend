@@ -71,15 +71,21 @@ function uniqueSku(base, used) {
     return candidate;
 }
 
-function generateMissingSkus(productName, productId, variantRows) {
+function optionLabel(options, value) {
+    return options.find((option) => String(option.value) === String(value))?.label || value;
+}
+
+function generateMissingSkus(productName, variantRows, options = {}) {
+    const { colors = [], unitTypes = [], units: unitOptions = [] } = options;
     const used = new Set(variantRows.flatMap((variant) => [variant.sku, ...(variant.units || []).map((unit) => unit.sku)]).map((value) => String(value || "").trim().toUpperCase()).filter(Boolean));
-    const productKey = productId ? `P${productId}` : Date.now().toString(36).toUpperCase();
-    const root = `${skuPart(productName, 40)}-${skuPart(productKey)}`;
+    const root = `MITTYCO-${skuPart(productName, 48)}`;
     return variantRows.map((variant, variantIndex) => {
-        const variantSku = String(variant.sku || "").trim() || uniqueSku(`${root}-V${variantIndex + 1}`, used);
+        const color = variant.color ? skuPart(optionLabel(colors, variant.color), 24) : "";
+        const variantPart = color || `V${variantIndex + 1}`;
+        const variantSku = String(variant.sku || "").trim() || uniqueSku(`${root}-${variantPart}`, used);
         const units = (variant.units || []).map((unit, unitIndex) => ({
             ...unit,
-            sku: String(unit.sku || "").trim() || uniqueSku(`${variantSku}-U${unitIndex + 1}`, used),
+            sku: String(unit.sku || "").trim() || uniqueSku(`${root}-${color ? `${color}-` : ""}${skuPart(optionLabel(unitTypes, unit.unit_type), 18)}-${skuPart(optionLabel(unitOptions, unit.unit), 24)}`, used),
         }));
         return { ...variant, sku: variantSku, units };
     });
@@ -207,7 +213,7 @@ export default function ProductEditor({ readOnly = false }) {
         const hasMissingSkus = variants.some((variant) => !String(variant.sku || "").trim() || (variant.units || []).some((unit) => !String(unit.sku || "").trim()));
         let variantsToSave = variants;
         if (hasMissingSkus && window.confirm("Some SKU fields are empty. Automatically generate unique SKUs now? OK = Yes, Cancel = No.")) {
-            variantsToSave = generateMissingSkus(product.name, id, variants);
+            variantsToSave = generateMissingSkus(product.name, variants, dropdowns);
             setVariants(variantsToSave);
         }
         if (!window.confirm(editing ? "Save changes to this product?" : "Create this product?")) return;
