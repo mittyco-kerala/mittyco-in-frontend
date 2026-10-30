@@ -10,7 +10,7 @@ import showToast from "../../../utils/toast";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { hasAuthSession } from "../../auth/authUtils";
 import DirhamAmount from "../../../components/DirhamAmount";
-import { getHomepageProductPricing } from "../utils/productPricing";
+import { formatOfferLabel, getHomepageProductPricing } from "../utils/productPricing";
 import ProductHighlightRail from "./ProductHighlightRail";
 import ProductMessageRail from "./ProductMessageRail";
 import OfferSideRail from "./OfferSideRail";
@@ -137,7 +137,8 @@ function New_Arrival_Home({
                             const { variant, size } = getProductSelection(item);
                             const isWishlisted = wishlist.some((wishlistItem) => String(wishlistItem.variant) === String(variant?.id) && String(wishlistItem.variant_size ?? "") === String(size?.id ?? ""));
                             const image = getProductImage(item);
-                            const { currentPrice, originalPrice, discountPercentage, hasOffer } = getHomepageProductPricing(item, variant);
+                            const { currentPrice, originalPrice, discountPercentage, discountType, discountValue, hasOffer } = getHomepageProductPricing(item, variant);
+                            const offerLabel = formatOfferLabel({ discountType, discountValue, discountPercentage });
 
                             return (
                                 <article key={item.id} className="new-product-card">
@@ -152,7 +153,7 @@ function New_Arrival_Home({
                                             <img src={image ? getImageUrl(image) : undefined} alt={item.name} className="product-img" />
                                             <button type="button" className="quick-add-btn" onClick={(event) => { event.stopPropagation(); navigate(`/single/${item.id}`); }}>VIEW PRODUCT</button>
                                         </div>
-                                        {hasOffer && <OfferSideRail percentage={discountPercentage} />}
+                                        {hasOffer && <OfferSideRail discountType={discountType} discountValue={discountValue} percentage={discountPercentage} />}
                                         <button type="button" className={`wishlist-btn ${isWishlisted ? "is-wishlisted" : ""}`} onClick={(event) => addToWishlist(item, event)} aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}>{isWishlisted ? <FaHeart className="heart-icon" /> : <FaRegHeart className="heart-icon" />}</button>
                                     </div>
 
@@ -168,7 +169,7 @@ function New_Arrival_Home({
                                                     {originalPrice !== null && <span className="old-price"><DirhamAmount value={originalPrice} fallback="Price unavailable" /></span>}
                                                     <div className="price-row">
                                                         <span className="product-price"><DirhamAmount value={currentPrice} fallback="Price unavailable" /></span>
-                                                        {hasOffer && <span className="price-savings">Save {discountPercentage}%</span>}
+                                                        {hasOffer && <span className="price-savings">Save {offerLabel.replace(" OFF", "")}</span>}
                                                     </div>
                                                 </div>
                                             </div>

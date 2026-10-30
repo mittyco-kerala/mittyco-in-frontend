@@ -12,6 +12,7 @@ import DirhamAmount from "../../../components/DirhamAmount";
 import ProductHighlightRail from "../../home/components/ProductHighlightRail";
 import ProductMessageRail from "../../home/components/ProductMessageRail";
 import OfferSideRail from "../../home/components/OfferSideRail";
+import { formatOfferLabel } from "../../home/utils/productPricing";
 
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
 
@@ -59,8 +60,10 @@ function getPricing(product, variant) {
     const currentPrice = product?.current_price ?? product?.discounted_price ?? product?.starting_price ?? variant?.discounted_price ?? variant?.price;
     const discountedPrice = product?.discounted_price ?? variant?.discounted_price;
     const hasOffer = product?.has_offer === true || (hasValue(product?.discount_percentage) && Number(product.discount_percentage) > 0);
+    const discountType = product?.discount_type || variant?.discount_type || product?.offer?.discount_type || "PERCENTAGE";
+    const discountValue = product?.discount_value ?? product?.fixed_amount ?? variant?.discount_value ?? variant?.fixed_amount ?? product?.discount_percentage;
 
-    return { originalPrice, currentPrice, discountedPrice, hasOffer };
+    return { originalPrice, currentPrice, discountedPrice, hasOffer, discountType, discountValue };
 }
 
 function Product_card({ products = [], isLoading, error, page = 1, pageSize = 14, count = 0, onPageChange, showPagination = true, compact = false }) {
@@ -111,7 +114,8 @@ function Product_card({ products = [], isLoading, error, page = 1, pageSize = 14
         {products.map((product) => {
             const { variant: firstVariant, unit: firstUnit } = getProductSelection(product);
             const isWishlisted = !!wishdata.find((item) => String(item.variant) === String(firstVariant?.id) && String(item.variant_size ?? "") === String(firstUnit?.id ?? ""));
-            const { originalPrice, currentPrice, discountedPrice, hasOffer } = getPricing(product, firstVariant);
+            const { originalPrice, currentPrice, discountedPrice, hasOffer, discountType, discountValue } = getPricing(product, firstVariant);
+            const offerLabel = formatOfferLabel({ discountType, discountValue, discountPercentage: product.discount_percentage });
             const image = getProductImage(product, firstVariant);
             const displayPrice = hasOffer && hasValue(discountedPrice) ? discountedPrice : currentPrice;
             const showOriginalPrice = hasOffer && hasValue(originalPrice) && hasValue(displayPrice) && String(originalPrice) !== String(displayPrice);
@@ -144,7 +148,7 @@ function Product_card({ products = [], isLoading, error, page = 1, pageSize = 14
                             VIEW PRODUCT
                         </button>
                     </div>
-                    {hasOffer && <OfferSideRail percentage={product.discount_percentage} />}
+                    {hasOffer && <OfferSideRail discountType={discountType} discountValue={discountValue} percentage={product.discount_percentage} />}
                     <button className={`favorite_btn ${isWishlisted ? "active" : ""}`} onClick={(event) => addToWishlist(product, event)} aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}><FaHeart /></button>
                 </div>
                 <div className="product_info">
@@ -160,7 +164,7 @@ function Product_card({ products = [], isLoading, error, page = 1, pageSize = 14
                                 <span className={showOriginalPrice ? "new-price" : "price"}>
                                     <DirhamAmount value={displayPrice} fallback="Price unavailable" />
                                 </span>
-                                {hasOffer && showOriginalPrice && <span className="price-savings">Save {product.discount_percentage}%</span>}
+                                {hasOffer && showOriginalPrice && <span className="price-savings">Save {offerLabel.replace(" OFF", "")}</span>}
                             </div>
                         </div>
                         <span className={`product-availability ${availability.toLowerCase().includes("out") ? "is-unavailable" : ""}`}>{availability}</span>

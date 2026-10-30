@@ -16,6 +16,7 @@ import CouponEditor from "./CouponEditor";
 import CouponUsageEditor from "./CouponUsageEditor";
 import WelcomeBonusEditor from "./WelcomeBonusEditor";
 import WelcomeBonusPage from "./WelcomeBonusPage";
+import OfferEditor from "./OfferEditor";
 import TokenBlacklistPage from "./TokenBlacklistPage";
 import navbarLogo from "../../../assets/mittyco/mittyco-logo-transparent-dark.png";
 import { getImageUrl } from "../../../utils/imageUrl";
@@ -31,7 +32,7 @@ const resources = {
     users: { label: "Users", group: "Customers", fields: ["email", "password", "first_name", "last_name", "role", "is_staff", "is_active"], columns: ["email", "first_name", "last_name", "role", "last_login", "is_active"] },
     categories: { label: "Categories", group: "Catalog", fields: ["name", "image", "is_active"], columns: ["name", "image", "is_active"] },
     subcategories: { label: "Subcategories", group: "Catalog", fields: ["category", "name", "image", "is_active"], columns: ["id", "category", "name", "image", "is_active"] },
-    offers: { label: "Offers", group: "Catalog", fields: ["title", "description", "image", "discount_percentage", "start_date", "end_date", "is_active"], columns: ["title", "discount_percentage", "start_date", "end_date", "is_active"] },
+    offers: { label: "Offers", group: "Catalog", fields: ["title", "description", "image", "product", "variant", "discount_type", "discount_percentage", "fixed_amount", "start_date", "end_date", "is_active"], columns: ["title", "product", "variant", "discount_type", "discount_value", "start_date", "end_date", "is_active"] },
     brands: { label: "Brands", itemLabel: "Brand", group: "Catalog", fields: ["name", "logo", "is_active"], columns: ["name", "logo", "is_active"] },
     colors: { label: "Colors", group: "Catalog", fields: ["name", "code"], columns: ["name", "code"] },
     "unit-types": { label: "Unit Types", group: "Catalog", fields: ["name"], columns: ["name"] },
@@ -121,6 +122,13 @@ const couponDiscount = (row) => {
     }
     const percentage = row?.discount_percentage ?? row?.discount_value;
     return percentage === null || percentage === undefined || percentage === "" ? "—" : `${percentage}%`;
+};
+const offerVariantLabel = (row, references) => {
+    const variantId = row?.variant?.id ?? row?.variant;
+    if (variantId === null || variantId === undefined || variantId === "") return "All variants";
+    const variant = (references["product-variants"] || []).find((item) => String(recordId(item)) === String(variantId)) || row?.variant;
+    if (!variant || typeof variant !== "object") return variant || "—";
+    return [variant.color?.name || variant.color_name, variant.sku, variant.id ? `#${variant.id}` : null].filter(Boolean).join(" · ") || "—";
 };
 
 function fieldsFromSchema(schema, resource) {
@@ -302,12 +310,13 @@ export default function OrderDashboard() {
     const isCouponEditor = pathKey === "coupons" && (location.pathname.endsWith("/new") || isEditRoute);
     const isCouponUsageEditor = pathKey === "coupon-usages" && (location.pathname.endsWith("/new") || isEditRoute);
     const isWelcomeBonusEditor = pathKey === "welcome-bonuses" && (location.pathname.endsWith("/new") || isEditRoute);
+    const isOfferEditor = pathKey === "offers" && (location.pathname.endsWith("/new") || isEditRoute);
     const isWelcomeBonusView = pathKey === "welcome-bonuses" && Boolean(detailId) && location.pathname.endsWith("/view");
     const isTrustBenefitEditor = pathKey === "trust-benefits" && (location.pathname.endsWith("/new") || isEditRoute);
     const isProductHighlightEditor = pathKey === "product-highlights" && (location.pathname.endsWith("/new") || isEditRoute);
     const isProductMessageEditor = pathKey === "product-messages" && (location.pathname.endsWith("/new") || isEditRoute);
     const isOrderEditor = pathKey === "orders" && Boolean(detailId) && isEditRoute;
-    const isGenericEditPage = Boolean(detailId) && isEditRoute && Boolean(resources[pathKey]) && !["products", "orders", "hero-banners", "promo-banners", "hero-side-banners", "coupons", "coupon-usages", "welcome-bonuses", "trust-benefits"].includes(pathKey);
+    const isGenericEditPage = Boolean(detailId) && isEditRoute && Boolean(resources[pathKey]) && !["products", "orders", "offers", "hero-banners", "promo-banners", "hero-side-banners", "coupons", "coupon-usages", "welcome-bonuses", "trust-benefits"].includes(pathKey);
     const isReadOnlyResourceView = Boolean(detailId) && !isEditRoute && pathKey !== "products" && pathKey !== "orders" && pathKey !== "welcome-bonuses" && Boolean(resources[pathKey]);
 
     useEffect(() => {
@@ -342,7 +351,7 @@ export default function OrderDashboard() {
             <div className="admin-sidebar-footer"><div className="admin-user"><span>{(getAuthValue("first_name") || "S").slice(0, 1).toUpperCase()}</span><div><strong>{getAuthValue("first_name") || "Super Admin"}</strong><small>Super Admin</small></div></div><button className="admin-nav-item admin-logout-button" onClick={logout}><FiLogOut /><span>Sign out</span></button></div>
         </aside>
         {sidebarOpen && <button className="admin-scrim" onClick={() => setSidebarOpen(false)} aria-label="Close menu" />}
-        <main className="admin-content"><header className="admin-topbar"><button type="button" className="admin-menu" onClick={() => setSidebarOpen(true)} aria-label="Open navigation"><FiMenu /></button><div><p className="admin-eyebrow">SUPER ADMIN / {currentTitle.toUpperCase()}</p><h1>{currentTitle}</h1></div><div className="admin-top-actions"><button type="button" className={`admin-button secondary refresh-action ${refreshing ? "is-refreshing" : ""}`} onClick={refreshDashboard} disabled={refreshing} aria-label="Refresh dashboard"><FiRefreshCw aria-hidden="true" /> <span>{refreshing ? "Refreshing..." : "Refresh"}</span></button><FiActivity className="admin-live" title="Live admin workspace" aria-label="Live admin workspace" /></div></header>{forbidden && <div className="admin-access-alert" role="alert"><FiSettings /><span><strong>Super Admin access required</strong><small>Your account does not have permission to access this resource.</small></span><button type="button" onClick={() => setForbidden(false)} aria-label="Dismiss access alert"><FiX /></button></div>}{isProductEditor ? <ProductEditor /> : isProductView ? <ProductView /> : isHeroBannerEditor ? <HeroBannerEditor schema={schema} /> : isPromoBannerEditor ? <PromoBannerEditor /> : isHeroSideBannerEditor ? <HeroSideBannerEditor /> : isCouponEditor ? <CouponEditor /> : isCouponUsageEditor ? <CouponUsageEditor /> : isWelcomeBonusEditor ? <WelcomeBonusEditor /> : isTrustBenefitEditor || isProductHighlightEditor || isProductMessageEditor ? <ResourceEditorPage resource={pathKey} id={isEditRoute ? detailId : undefined} schema={schema} /> : isWelcomeBonusView ? <WelcomeBonusPage /> : isOrderEditor ? <OrderEditPage id={detailId} /> : detailId && pathKey === "orders" ? <OrderDetail id={detailId} /> : isGenericEditPage ? <ResourceEditorPage resource={pathKey} id={detailId} schema={schema} /> : isReadOnlyResourceView ? <ReadOnlyResourcePage resource={pathKey} id={detailId} schema={schema} /> : pathKey === "overview" ? <Overview data={overview} loading={overviewLoading} /> : pathKey === "welcome-bonuses" ? <WelcomeBonusPage /> : pathKey === "token-blacklist/outstanding-tokens" ? <TokenBlacklistPage type="outstanding" /> : pathKey === "token-blacklist/blacklisted-tokens" ? <TokenBlacklistPage type="blacklisted" /> : resources[pathKey] ? <ResourcePage key={pathKey} resource={pathKey} schema={schema} /> : <Overview data={overview} loading={overviewLoading} />}</main>
+        <main className="admin-content"><header className="admin-topbar"><button type="button" className="admin-menu" onClick={() => setSidebarOpen(true)} aria-label="Open navigation"><FiMenu /></button><div><p className="admin-eyebrow">SUPER ADMIN / {currentTitle.toUpperCase()}</p><h1>{currentTitle}</h1></div><div className="admin-top-actions"><button type="button" className={`admin-button secondary refresh-action ${refreshing ? "is-refreshing" : ""}`} onClick={refreshDashboard} disabled={refreshing} aria-label="Refresh dashboard"><FiRefreshCw aria-hidden="true" /> <span>{refreshing ? "Refreshing..." : "Refresh"}</span></button><FiActivity className="admin-live" title="Live admin workspace" aria-label="Live admin workspace" /></div></header>{forbidden && <div className="admin-access-alert" role="alert"><FiSettings /><span><strong>Super Admin access required</strong><small>Your account does not have permission to access this resource.</small></span><button type="button" onClick={() => setForbidden(false)} aria-label="Dismiss access alert"><FiX /></button></div>}{isProductEditor ? <ProductEditor /> : isProductView ? <ProductView /> : isOfferEditor ? <OfferEditor /> : isHeroBannerEditor ? <HeroBannerEditor schema={schema} /> : isPromoBannerEditor ? <PromoBannerEditor /> : isHeroSideBannerEditor ? <HeroSideBannerEditor /> : isCouponEditor ? <CouponEditor /> : isCouponUsageEditor ? <CouponUsageEditor /> : isWelcomeBonusEditor ? <WelcomeBonusEditor /> : isTrustBenefitEditor || isProductHighlightEditor || isProductMessageEditor ? <ResourceEditorPage resource={pathKey} id={isEditRoute ? detailId : undefined} schema={schema} /> : isWelcomeBonusView ? <WelcomeBonusPage /> : isOrderEditor ? <OrderEditPage id={detailId} /> : detailId && pathKey === "orders" ? <OrderDetail id={detailId} /> : isGenericEditPage ? <ResourceEditorPage resource={pathKey} id={detailId} schema={schema} /> : isReadOnlyResourceView ? <ReadOnlyResourcePage resource={pathKey} id={detailId} schema={schema} /> : pathKey === "overview" ? <Overview data={overview} loading={overviewLoading} /> : pathKey === "welcome-bonuses" ? <WelcomeBonusPage /> : pathKey === "token-blacklist/outstanding-tokens" ? <TokenBlacklistPage type="outstanding" /> : pathKey === "token-blacklist/blacklisted-tokens" ? <TokenBlacklistPage type="blacklisted" /> : resources[pathKey] ? <ResourcePage key={pathKey} resource={pathKey} schema={schema} /> : <Overview data={overview} loading={overviewLoading} />}</main>
     </div>;
 }
 
@@ -479,7 +488,16 @@ function ResourcePage({ resource, schema }) {
             return resolveTableValue(row, key, resource === "units" ? { ...tableReferences, "unit-types": unitTypeRows } : tableReferences);
         },
     }));
-    const columns = resource === "coupons" ? [
+    const columns = resource === "offers" ? [
+        { key: "title", label: "Offer", render: (row) => row?.title || "—" },
+        { key: "product", label: "Product", render: (row) => resolveTableValue(row, "product", tableReferences) },
+        { key: "variant", label: "Variant", render: (row) => offerVariantLabel(row, tableReferences) },
+        { key: "discount_type", label: "Discount Type", render: (row) => String(row?.discount_type || "PERCENTAGE").toUpperCase() === "FIXED" ? "Fixed Amount" : "Percentage" },
+        { key: "discount_value", label: "Discount", render: (row) => couponDiscount(row) },
+        { key: "start_date", label: "Start Date", render: (row) => date(row?.start_date) },
+        { key: "end_date", label: "Expiry Date", render: (row) => date(row?.end_date) },
+        { key: "is_active", label: "Status", render: (row) => <StatusPill value={row?.is_active ? "Active" : "Inactive"} /> },
+    ] : resource === "coupons" ? [
         { key: "copy", label: "Copy", render: (row) => <button type="button" className="table-copy-button" title="Copy coupon code" onClick={async () => { if (!row?.code) return; try { await navigator.clipboard.writeText(row.code); toast.success("Coupon code copied"); } catch { toast.error("Could not copy coupon code"); } }}><FiCopy /> Copy</button> },
         { key: "code", label: "Coupon Code", render: (row) => row?.code || "—" },
         { key: "applicability_type", label: "Apply To", render: (row) => couponApplyTo(row) },
@@ -493,7 +511,7 @@ function ResourcePage({ resource, schema }) {
     const clearFilters = () => { setSearch(""); setOrdering(defaultOrdering); setStatus(""); setPaymentStatus(""); setDateFrom(""); setDateTo(""); setCouponProduct(""); setCouponCategory(""); setCouponDiscountType(""); setCouponActive(""); setPage(1); };
     const openView = (row) => navigate(`/mittyco-dashboard/${resource}/${recordId(row)}/view`);
     const openEdit = (row) => navigate(`/mittyco-dashboard/${resource}/${recordId(row)}/edit`);
-    const addAction = resource === "products" ? () => navigate("/mittyco-dashboard/products/new") : ["hero-banners", "promo-banners", "hero-side-banners", "coupons", "coupon-usages", "trust-benefits", "product-highlights", "product-messages"].includes(resource) ? () => navigate(`/mittyco-dashboard/${resource}/new`) : () => setModal({ mode: "create", initialValues: resource === "trust-benefits" ? { is_active: true, display_order: 1 } : {} });
+    const addAction = resource === "products" ? () => navigate("/mittyco-dashboard/products/new") : ["offers", "hero-banners", "promo-banners", "hero-side-banners", "coupons", "coupon-usages", "trust-benefits", "product-highlights", "product-messages"].includes(resource) ? () => navigate(`/mittyco-dashboard/${resource}/new`) : () => setModal({ mode: "create", initialValues: resource === "trust-benefits" ? { is_active: true, display_order: 1 } : {} });
     const toggleCoupon = async (row) => {
         if (togglingId) return;
         const couponId = recordId(row);

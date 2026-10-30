@@ -109,3 +109,4 @@
 .related-products-search-results p { padding: 11px; }
 .related-products-limit { padding: 10px 11px; border: 1px solid #efd8bd; border-radius: 7px; background: #fff9f1; color: #90662d; }
 @media (max-width: 520px) { .related-products-manual { padding: 12px; } .related-products-manual-heading { flex-direction: column; } .related-products-selected-list li { align-items: flex-start; flex-wrap: wrap; } .related-products-selected-list strong { flex: 1 1 calc(100% - 36px); white-space: normal; } .related-products-item-actions { width: 100%; margin-left: 33px; } }
+.offer-management-note{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px;border:1px solid var(--admin-line);border-radius:10px;background:#fbfcfb;color:var(--admin-muted);font-size:13px;line-height:1.5}.offer-management-note p{margin:0;max-width:680px}

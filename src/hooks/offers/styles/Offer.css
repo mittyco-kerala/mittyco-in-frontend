@@ -80,6 +80,19 @@
   overflow-wrap: anywhere;
 }
 
+.offer-discount-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border: 1px solid rgba(255,255,255,.82);
+  border-radius: 999px;
+  background: rgba(244,196,48,.92);
+  color: #173b35;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .6px;
+}
+
 .offer-description {
   font-family: 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px;

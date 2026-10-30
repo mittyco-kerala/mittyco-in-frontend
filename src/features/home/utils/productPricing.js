@@ -16,6 +16,22 @@ const toPercentage = (value) => {
     return Number.isFinite(numericValue) && numericValue > 0 && numericValue <= 100 ? numericValue : null;
 };
 
+const toDiscountType = (product, variant) => String(
+    product?.discount_type
+    || variant?.discount_type
+    || product?.offer?.discount_type
+    || variant?.offer?.discount_type
+    || ""
+).toUpperCase();
+
+const toDiscountValue = (product, variant, type, reportedPercentage) => {
+    if (type === "FIXED") {
+        const fixed = Number(product?.fixed_amount ?? product?.discount_value ?? variant?.fixed_amount ?? variant?.discount_value ?? product?.offer?.fixed_amount);
+        return Number.isFinite(fixed) && fixed > 0 ? fixed : null;
+    }
+    return reportedPercentage;
+};
+
 const roundedPercentage = (value) => Math.round(value * 100) / 100;
 
 /**
@@ -48,8 +64,10 @@ export function getHomepageProductPricing(product = {}, variant = null, now = ne
     const calculatedDiscount = originalPrice !== null && currentPrice !== null
         ? roundedPercentage(((originalPrice - currentPrice) / originalPrice) * 100)
         : null;
-    const reportedDiscount = toPercentage(product.discount_percentage);
-    const hasReportedOffer = product.has_offer !== false && reportedDiscount !== null;
+    const reportedDiscount = toPercentage(product.discount_percentage ?? variant?.discount_percentage);
+    const discountType = toDiscountType(product, variant);
+    const discountValue = toDiscountValue(product, variant, discountType, reportedDiscount);
+    const hasReportedOffer = product.has_offer !== false && discountValue !== null;
     // A percentage by itself is not enough to show a sale badge. The API must
     // also provide a real comparison price that is higher than the selling
     // price; this prevents malformed or stale payloads from showing a fake
@@ -63,9 +81,20 @@ export function getHomepageProductPricing(product = {}, variant = null, now = ne
     return {
         currentPrice,
         originalPrice: hasOffer ? originalPrice : null,
-        discountPercentage: hasOffer ? (calculatedDiscount ?? reportedDiscount) : null,
+        discountPercentage: hasOffer && discountType !== "FIXED" ? (calculatedDiscount ?? reportedDiscount) : null,
+        discountType: hasOffer ? (discountType || "PERCENTAGE") : null,
+        discountValue: hasOffer ? (discountValue ?? calculatedDiscount) : null,
         hasOffer,
     };
+}
+
+export function formatOfferLabel({ discountType, discountValue, discountPercentage } = {}) {
+    const value = Number(discountValue ?? discountPercentage);
+    if (!Number.isFinite(value) || value <= 0) return "";
+    if (String(discountType).toUpperCase() === "FIXED") {
+        return `₹${value.toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 2 })} OFF`;
+    }
+    return `${value % 1 === 0 ? value : value.toFixed(2).replace(/0+$/, "").replace(/\.$/, "")}% OFF`;
 }
 
 export function formatHomepagePrice(value) {
