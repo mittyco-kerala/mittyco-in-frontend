@@ -165,6 +165,7 @@ function Single_product() {
     const keyFeatures = getKeyFeatures(data.key_features);
 
     const [selectedColor, setSelectedColor] = useState(null);
+    const [selectedVariantId, setSelectedVariantId] = useState(null);
 
     const [selectedSize, setSelectedSize] = useState(null);
 
@@ -373,9 +374,9 @@ function Single_product() {
     */
 
     const selectedVariant =
+        data?.variants?.find((variant) => String(variant.id) === String(selectedVariantId)) ||
         data?.variants?.find(
-            variant =>
-                variant.color?.id === selectedColor?.id
+            variant => variant.color?.id === selectedColor?.id
         ) ||
         data?.variants?.[0];
 
@@ -391,6 +392,7 @@ function Single_product() {
             );
 
             if (variant) {
+                setSelectedVariantId(variant.id);
                 setSelectedColor(
                     variant.color
                 );
@@ -419,6 +421,7 @@ function Single_product() {
         const firstVariant =
             data.variants[0];
 
+        setSelectedVariantId(firstVariant.id);
         setSelectedColor(
             firstVariant.color
         );
@@ -726,6 +729,7 @@ function Single_product() {
                                         title={color.name}
                                         onClick={() => {
                                             const variant = data.variants.find(item => item.color?.id === color.id);
+                                            setSelectedVariantId(variant?.id || null);
                                             setSelectedColor(color);
                                             setSelectedSize(null);
                                             const image = variant?.images?.find(img => img.is_primary) || variant?.images?.[0];
@@ -738,6 +742,30 @@ function Single_product() {
                             })}
                         </div>
                     </div>}
+
+                    {colors.length === 0 && data?.variants?.length > 1 && (
+                        <div className="option-block variant-selection-block">
+                            <h4>Variant: <span className="selected-option-label">{selectedVariant?.sku || `Variant ${data.variants.findIndex((item) => item.id === selectedVariant?.id) + 1}`}</span></h4>
+                            <div className="sizes">
+                                {data.variants.map((variant, index) => (
+                                    <button
+                                        type="button"
+                                        key={variant.id || index}
+                                        className={selectedVariant?.id === variant.id ? "size-btn active-size" : "size-btn"}
+                                        onClick={() => {
+                                            setSelectedVariantId(variant.id);
+                                            setSelectedColor(variant.color || null);
+                                            setSelectedSize(null);
+                                            const image = variant.images?.find((img) => img.is_primary) || variant.images?.[0];
+                                            setActiveImage(image?.image || null);
+                                        }}
+                                    >
+                                        {variant.sku || `Variant ${index + 1}`}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {selectedVariant?.price_type === 'multiple' && availableSizes?.some(item => item.unit || item.size) && (
                         <div className="option-block">
