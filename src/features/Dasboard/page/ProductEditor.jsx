@@ -54,6 +54,37 @@ function deduplicateImages(images = []) {
     return { images: unique, duplicateIds };
 }
 
+function skuPart(value, limit = 28) {
+    return String(value || "").toUpperCase().replace(/[^A-Z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, limit) || "PRODUCT";
+}
+
+function uniqueSku(base, used) {
+    const root = skuPart(base, 88);
+    let candidate = root;
+    let suffix = 2;
+    while (used.has(candidate)) {
+        const suffixText = `-${suffix}`;
+        candidate = `${root.slice(0, 100 - suffixText.length)}${suffixText}`;
+        suffix += 1;
+    }
+    used.add(candidate);
+    return candidate;
+}
+
+function generateMissingSkus(productName, productId, variantRows) {
+    const used = new Set(variantRows.flatMap((variant) => [variant.sku, ...(variant.units || []).map((unit) => unit.sku)]).map((value) => String(value || "").trim().toUpperCase()).filter(Boolean));
+    const productKey = productId ? `P${productId}` : Date.now().toString(36).toUpperCase();
+    const root = `${skuPart(productName, 40)}-${skuPart(productKey)}`;
+    return variantRows.map((variant, variantIndex) => {
+        const variantSku = String(variant.sku || "").trim() || uniqueSku(`${root}-V${variantIndex + 1}`, used);
+        const units = (variant.units || []).map((unit, unitIndex) => ({
+            ...unit,
+            sku: String(unit.sku || "").trim() || uniqueSku(`${variantSku}-U${unitIndex + 1}`, used),
+        }));
+        return { ...variant, sku: variantSku, units };
+    });
+}
+
 export default function ProductEditor({ readOnly = false }) {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -173,14 +204,20 @@ export default function ProductEditor({ readOnly = false }) {
     const save = async (event) => {
         event.preventDefault(); if (readOnly) return;
         const validation = validate(); if (Object.keys(validation).length) { setFieldErrors(validation); setError(Object.values(validation).join(" ")); return; }
+        const hasMissingSkus = variants.some((variant) => !String(variant.sku || "").trim() || (variant.units || []).some((unit) => !String(unit.sku || "").trim()));
+        let variantsToSave = variants;
+        if (hasMissingSkus && window.confirm("Some SKU fields are empty. Automatically generate unique SKUs now? OK = Yes, Cancel = No.")) {
+            variantsToSave = generateMissingSkus(product.name, id, variants);
+            setVariants(variantsToSave);
+        }
         if (!window.confirm(editing ? "Save changes to this product?" : "Create this product?")) return;
         setSaving(true); setError(""); setFieldErrors({}); let activeVariantIndex = -1; let activeUnitIndex = -1;
         try {
             const productPayload = makeProductPayload(product);
             const productResponse = editing ? await updateResource("products", id, productPayload) : await createResource("products", productPayload);
             const productId = id || idOf(productResponse.data); if (!productId) throw new Error("The product response did not contain an id.");
-            for (let index = 0; index < variants.length; index += 1) {
-                activeVariantIndex = index; const variant = variants[index];
+            for (let index = 0; index < variantsToSave.length; index += 1) {
+                activeVariantIndex = index; const variant = variantsToSave[index];
                 const variantPayload = { product: productId, color: variant.color || null, price_type: variant.price_type, price: variant.price_type === "single" ? Number(variant.price) : null, stock: variant.price_type === "single" ? Number(variant.stock) : 0 };
                 if (String(variant.sku || "").trim()) variantPayload.sku = String(variant.sku).trim();
                 const variantResponse = idOf(variant) ? await updateResource("product-variants", idOf(variant), variantPayload) : await createResource("product-variants", variantPayload);
