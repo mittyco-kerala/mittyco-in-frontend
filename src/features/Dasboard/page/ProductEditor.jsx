@@ -181,9 +181,8 @@ export default function ProductEditor({ readOnly = false }) {
             const productId = id || idOf(productResponse.data); if (!productId) throw new Error("The product response did not contain an id.");
             for (let index = 0; index < variants.length; index += 1) {
                 activeVariantIndex = index; const variant = variants[index];
-                const variantPayload = { product: productId, color: variant.color || null, price_type: variant.price_type, stock: variant.price_type === "single" ? Number(variant.stock) : 0 };
+                const variantPayload = { product: productId, color: variant.color || null, price_type: variant.price_type, price: variant.price_type === "single" ? Number(variant.price) : null, stock: variant.price_type === "single" ? Number(variant.stock) : 0 };
                 if (String(variant.sku || "").trim()) variantPayload.sku = String(variant.sku).trim();
-                if (variant.price_type === "single") variantPayload.price = Number(variant.price);
                 const variantResponse = idOf(variant) ? await updateResource("product-variants", idOf(variant), variantPayload) : await createResource("product-variants", variantPayload);
                 const variantId = idOf(variant) || idOf(variantResponse.data); if (!variantId) throw new Error("The variant response did not contain an id.");
                 if (variant.price_type === "single") for (const unitId of [...variant.deletedUnits, ...variant.units.map(idOf).filter(Boolean)]) await deleteResource("product-variant-units", unitId);
