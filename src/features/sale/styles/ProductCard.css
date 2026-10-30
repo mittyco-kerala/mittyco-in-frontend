@@ -13,8 +13,6 @@
     gap: 24px;
     width: 100%;
     min-width: 0;
-    align-items: stretch;
-    grid-auto-rows: 1fr;
 
 }
 
@@ -42,24 +40,17 @@
 .product_card {
     display: flex;
     flex-direction: column;
-    box-sizing: border-box;
-    background: #ffffff;
-    border: 1px solid rgba(31, 91, 62, 0.10);
-    border-radius: 16px;
-    box-shadow: 0 8px 22px rgba(31, 91, 62, 0.07);
+    background: transparent;
+    /* No card background color */
+    border-radius: 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
     padding: 10px;
     overflow: visible;
     cursor: pointer;
     width: 100%;
-    min-height: 100%;
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    transition: transform 0.3s ease;
+    border-radius: 15px;
     height: 100%;
-}
-
-.product_card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(31, 91, 62, 0.20);
-    box-shadow: 0 14px 28px rgba(31, 91, 62, 0.12);
 }
 
 .product_card:focus-visible {
@@ -71,9 +62,10 @@
 .product_img {
     position: relative;
     width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 3 / 4;
+    /* Keeps exact portrait dimensions */
     overflow: hidden;
-    border-radius: 12px;
+    border-radius: 6px;
     background-color: #f7f7f7;
     display: flex;
     flex-direction: column;
@@ -266,7 +258,7 @@
 
 
 .product_info {
-    padding: 14px 4px 4px;
+    padding: 15px 0px 0px 15px;
     background: transparent;
     display: flex;
     flex-direction: column;
@@ -279,8 +271,7 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    margin-top: 2px;
-    min-height: 0;
+    margin-top: auto;
     min-width: 0;
 }
 
@@ -344,7 +335,7 @@
     font-size: 0.9rem;
     font-weight: 500;
     color: #2b2b2b;
-    margin: 0 0 4px 0;
+    margin: 0 0 8px 0;
     line-height: 1.4;
     min-height: 2.8em;
     height: 2.8em;
@@ -508,16 +499,6 @@
     background-color: transparent;
 }
 
-.skeleton-card {
-    cursor: default;
-}
-
-.skeleton-card:hover {
-    transform: none;
-    border-color: rgba(31, 91, 62, 0.10);
-    box-shadow: 0 8px 22px rgba(31, 91, 62, 0.07);
-}
-
 .skeleton-text {
     height: 14px;
     margin-bottom: 8px;
@@ -576,19 +557,6 @@
 
     .product-title {
         font-size: 13px;
-    }
-
-    .product_card {
-        padding: 8px;
-        border-radius: 13px;
-    }
-
-    .product_img {
-        border-radius: 10px;
-    }
-
-    .product-details-bottom {
-        min-height: 0;
     }
 }
 
