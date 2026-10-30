@@ -54,43 +54,6 @@ function deduplicateImages(images = []) {
     return { images: unique, duplicateIds };
 }
 
-function skuPart(value, limit = 28) {
-    return String(value || "").toUpperCase().replace(/[^A-Z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, limit) || "PRODUCT";
-}
-
-function uniqueSku(base, used) {
-    const root = skuPart(base, 88);
-    let candidate = root;
-    let suffix = 2;
-    while (used.has(candidate)) {
-        const suffixText = `-${suffix}`;
-        candidate = `${root.slice(0, 100 - suffixText.length)}${suffixText}`;
-        suffix += 1;
-    }
-    used.add(candidate);
-    return candidate;
-}
-
-function optionLabel(options, value) {
-    return options.find((option) => String(option.value) === String(value))?.label || value;
-}
-
-function generateMissingSkus(productName, variantRows, options = {}) {
-    const { colors = [], unitTypes = [], units: unitOptions = [] } = options;
-    const used = new Set(variantRows.flatMap((variant) => [variant.sku, ...(variant.units || []).map((unit) => unit.sku)]).map((value) => String(value || "").trim().toUpperCase()).filter(Boolean));
-    const root = `MITTYCO-${skuPart(productName, 48)}`;
-    return variantRows.map((variant, variantIndex) => {
-        const color = variant.color ? skuPart(optionLabel(colors, variant.color), 24) : "";
-        const variantPart = color || `V${variantIndex + 1}`;
-        const variantSku = String(variant.sku || "").trim() || uniqueSku(`${root}-${variantPart}`, used);
-        const units = (variant.units || []).map((unit, unitIndex) => ({
-            ...unit,
-            sku: String(unit.sku || "").trim() || uniqueSku(`${root}-${color ? `${color}-` : ""}${skuPart(optionLabel(unitTypes, unit.unit_type), 18)}-${skuPart(optionLabel(unitOptions, unit.unit), 24)}`, used),
-        }));
-        return { ...variant, sku: variantSku, units };
-    });
-}
-
 export default function ProductEditor({ readOnly = false }) {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -211,25 +174,21 @@ export default function ProductEditor({ readOnly = false }) {
         event.preventDefault(); if (readOnly) return;
         const validation = validate(); if (Object.keys(validation).length) { setFieldErrors(validation); setError(Object.values(validation).join(" ")); return; }
         const hasMissingSkus = variants.some((variant) => !String(variant.sku || "").trim() || (variant.units || []).some((unit) => !String(unit.sku || "").trim()));
-        let variantsToSave = variants;
-        if (hasMissingSkus && window.confirm("Some SKU fields are empty. Automatically generate unique SKUs now? OK = Yes, Cancel = No.")) {
-            variantsToSave = generateMissingSkus(product.name, variants, dropdowns);
-            setVariants(variantsToSave);
-        }
+        const generateSkus = hasMissingSkus && window.confirm("Some SKU fields are empty. Automatically generate unique SKUs now? OK = Yes, Cancel = No.");
         if (!window.confirm(editing ? "Save changes to this product?" : "Create this product?")) return;
         setSaving(true); setError(""); setFieldErrors({}); let activeVariantIndex = -1; let activeUnitIndex = -1;
         try {
             const productPayload = makeProductPayload(product);
             const productResponse = editing ? await updateResource("products", id, productPayload) : await createResource("products", productPayload);
             const productId = id || idOf(productResponse.data); if (!productId) throw new Error("The product response did not contain an id.");
-            for (let index = 0; index < variantsToSave.length; index += 1) {
-                activeVariantIndex = index; const variant = variantsToSave[index];
-                const variantPayload = { product: productId, color: variant.color || null, price_type: variant.price_type, price: variant.price_type === "single" ? Number(variant.price) : null, stock: variant.price_type === "single" ? Number(variant.stock) : 0 };
+            for (let index = 0; index < variants.length; index += 1) {
+                activeVariantIndex = index; const variant = variants[index];
+                const variantPayload = { product: productId, color: variant.color || null, price_type: variant.price_type, price: variant.price_type === "single" ? Number(variant.price) : null, stock: variant.price_type === "single" ? Number(variant.stock) : 0, generate_sku: generateSkus };
                 if (String(variant.sku || "").trim()) variantPayload.sku = String(variant.sku).trim();
                 const variantResponse = idOf(variant) ? await updateResource("product-variants", idOf(variant), variantPayload) : await createResource("product-variants", variantPayload);
                 const variantId = idOf(variant) || idOf(variantResponse.data); if (!variantId) throw new Error("The variant response did not contain an id.");
                 if (variant.price_type === "single") for (const unitId of [...variant.deletedUnits, ...variant.units.map(idOf).filter(Boolean)]) await deleteResource("product-variant-units", unitId);
-                else { for (const unitId of variant.deletedUnits) await deleteResource("product-variant-units", unitId); for (let unitIndex = 0; unitIndex < variant.units.length; unitIndex += 1) { activeUnitIndex = unitIndex; const unit = variant.units[unitIndex]; const unitPayload = { variant: variantId, unit_type: unit.unit_type, unit: unit.unit, price: Number(unit.price), stock: Number(unit.stock) }; if (String(unit.sku || "").trim()) unitPayload.sku = String(unit.sku).trim(); if (idOf(unit)) await updateResource("product-variant-units", idOf(unit), unitPayload); else await createResource("product-variant-units", unitPayload); } activeUnitIndex = -1; }
+                else { for (const unitId of variant.deletedUnits) await deleteResource("product-variant-units", unitId); for (let unitIndex = 0; unitIndex < variant.units.length; unitIndex += 1) { activeUnitIndex = unitIndex; const unit = variant.units[unitIndex]; const unitPayload = { variant: variantId, unit_type: unit.unit_type, unit: unit.unit, price: Number(unit.price), stock: Number(unit.stock), generate_sku: generateSkus }; if (String(unit.sku || "").trim()) unitPayload.sku = String(unit.sku).trim(); if (idOf(unit)) await updateResource("product-variant-units", idOf(unit), unitPayload); else await createResource("product-variant-units", unitPayload); } activeUnitIndex = -1; }
                 await saveVariantImages(variantId, variant);
                 const refreshedImages = sortImages(rows((await listResource("product-images", { variant: variantId, page_size: 500 })).data));
                 setVariants((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, id: idOf(item) || variantId, images: refreshedImages, deletedImages: [] } : item));
