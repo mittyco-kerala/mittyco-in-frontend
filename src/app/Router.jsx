@@ -96,6 +96,8 @@ function Router() {
                 <Route path="mittyco-dashboard/products/new" element={<AdminRoute><OrderDashboard /></AdminRoute>} />
                 <Route path="mittyco-dashboard/products/:id" element={<AdminRoute><OrderDashboard /></AdminRoute>} />
                 <Route path="mittyco-dashboard/products/:id/edit" element={<AdminRoute><OrderDashboard /></AdminRoute>} />
+                <Route path="mittyco-dashboard/offers/new" element={<AdminRoute><OrderDashboard /></AdminRoute>} />
+                <Route path="mittyco-dashboard/offers/:id/edit" element={<AdminRoute><OrderDashboard /></AdminRoute>} />
                 <Route path="mittyco-dashboard/hero-banners/new" element={<AdminRoute><OrderDashboard /></AdminRoute>} />
                 <Route path="mittyco-dashboard/hero-banners/:id/edit" element={<AdminRoute><OrderDashboard /></AdminRoute>} />
                 <Route path="mittyco-dashboard/promo-banners/new" element={<AdminRoute><OrderDashboard /></AdminRoute>} />
