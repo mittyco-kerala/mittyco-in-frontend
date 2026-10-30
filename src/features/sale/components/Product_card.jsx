@@ -25,8 +25,8 @@ function getFirstUnit(variant) {
     return variant.sizes?.[0] || variant.units?.[0] || null;
 }
 
-function getProductSelection(product) {
-    const variant = getFirstVariant(product) || (hasValue(product?.default_variant_id)
+function getProductSelection(product, preferredVariant = null) {
+    const variant = preferredVariant || getFirstVariant(product) || (hasValue(product?.default_variant_id)
         ? { id: product.default_variant_id, price_type: hasValue(product.default_variant_unit_id) ? "multiple" : "single" }
         : null);
     const unit = getFirstUnit(variant) || (hasValue(product?.default_variant_unit_id)
@@ -36,14 +36,10 @@ function getProductSelection(product) {
 }
 
 function getProductImage(product, variant) {
-    return product?.image
-        || product?.product_image
-        || variant?.images?.find((item) => item.is_primary)?.image
-        || variant?.images?.[0]?.image;
-}
-
-function getVariantLabel(variant, index) {
-    return variant?.color?.name || variant?.sku || `Variant ${index + 1}`;
+    return variant?.images?.find((item) => item.is_primary)?.image
+        || variant?.images?.[0]?.image
+        || product?.image
+        || product?.product_image;
 }
 
 function getAvailability(product, variant, unit) {
@@ -53,21 +49,33 @@ function getAvailability(product, variant, unit) {
     if (product?.in_stock === true) return "In stock";
     if (product?.in_stock === false) return "Out of stock";
 
-    const stock = product?.stock ?? unit?.stock ?? variant?.stock;
+    const stock = unit?.stock ?? variant?.stock ?? product?.stock;
     if (hasValue(stock)) return Number(stock) > 0 ? "In stock" : "Out of stock";
     if (product?.is_available === false) return "Out of stock";
     return "Availability varies";
 }
 
 function getPricing(product, variant) {
-    const originalPrice = product?.original_price ?? variant?.price ?? product?.starting_price;
-    const currentPrice = product?.current_price ?? product?.discounted_price ?? product?.starting_price ?? variant?.discounted_price ?? variant?.price;
-    const discountedPrice = product?.discounted_price ?? variant?.discounted_price;
+    const originalPrice = variant?.price ?? product?.original_price ?? product?.starting_price;
+    const currentPrice = variant?.discounted_price ?? variant?.price ?? product?.current_price ?? product?.discounted_price ?? product?.starting_price;
+    const discountedPrice = variant?.discounted_price ?? product?.discounted_price;
     const hasOffer = product?.has_offer === true || (hasValue(product?.discount_percentage) && Number(product.discount_percentage) > 0);
     const discountType = product?.discount_type || variant?.discount_type || product?.offer?.discount_type || "PERCENTAGE";
     const discountValue = product?.discount_value ?? product?.fixed_amount ?? variant?.discount_value ?? variant?.fixed_amount ?? product?.discount_percentage;
 
     return { originalPrice, currentPrice, discountedPrice, hasOffer, discountType, discountValue };
+}
+
+function getVariantUnitLabel(variant) {
+    const units = Array.isArray(variant?.sizes) ? variant.sizes : Array.isArray(variant?.units) ? variant.units : [];
+    return units
+        .map((item) => item?.unit?.name || item?.size?.name || item?.unit_name || item?.name)
+        .filter(Boolean)
+        .join(" / ");
+}
+
+function getVariantLabel(variant) {
+    return variant?.color?.name || getVariantUnitLabel(variant) || variant?.sku || "";
 }
 
 function Product_card({ products = [], isLoading, error, page = 1, pageSize = 14, count = 0, onPageChange, showPagination = true, compact = false }) {
@@ -78,7 +86,7 @@ function Product_card({ products = [], isLoading, error, page = 1, pageSize = 14
 
     useEffect(() => { if (!compact) window.scrollTo(0, 0); }, [compact, page]);
 
-    const addToWishlist = async (product, event) => {
+    const addToWishlist = async (product, event, preferredVariant = null) => {
         event.stopPropagation();
 
         if (!hasAuthSession()) {
@@ -87,7 +95,7 @@ function Product_card({ products = [], isLoading, error, page = 1, pageSize = 14
             return;
         }
 
-        const { variant: firstVariant, unit: firstUnit } = getProductSelection(product);
+        const { variant: firstVariant, unit: firstUnit } = getProductSelection(product, preferredVariant);
         if (!firstVariant || (firstVariant.price_type !== "single" && !firstUnit)) {
             showToast.error("Variant not available");
             return;
@@ -114,9 +122,15 @@ function Product_card({ products = [], isLoading, error, page = 1, pageSize = 14
     if (error) return <p className="error-state">Unable to load products. Please try again.</p>;
     if (!products.length) return null;
 
-    return <div className="catalog-container homepage-product-catalog"><section className={`products ${products.length <= 3 ? "shop-few-products" : "shop-many-products"}`}>
-        {products.map((product) => {
-            const { variant: firstVariant, unit: firstUnit } = getProductSelection(product);
+    const cardEntries = products.flatMap((product) => {
+        const variants = Array.isArray(product?.variants) ? product.variants : [];
+        if (variants.length > 1) return variants.map((variant) => ({ product, variant, splitVariant: true }));
+        return [{ product, variant: variants[0] || null, splitVariant: false }];
+    });
+
+    return <div className="catalog-container homepage-product-catalog"><section className={`products ${cardEntries.length <= 3 ? "shop-few-products" : "shop-many-products"}`}>
+        {cardEntries.map(({ product, variant: cardVariant, splitVariant }) => {
+            const { variant: firstVariant, unit: firstUnit } = getProductSelection(product, cardVariant);
             const isWishlisted = !!wishdata.find((item) => String(item.variant) === String(firstVariant?.id) && String(item.variant_size ?? "") === String(firstUnit?.id ?? ""));
             const { originalPrice, currentPrice, discountedPrice, hasOffer, discountType, discountValue } = getPricing(product, firstVariant);
             const offerLabel = formatOfferLabel({ discountType, discountValue, discountPercentage: product.discount_percentage });
@@ -124,17 +138,16 @@ function Product_card({ products = [], isLoading, error, page = 1, pageSize = 14
             const displayPrice = hasOffer && hasValue(discountedPrice) ? discountedPrice : currentPrice;
             const showOriginalPrice = hasOffer && hasValue(originalPrice) && hasValue(displayPrice) && String(originalPrice) !== String(displayPrice);
             const availability = getAvailability(product, firstVariant, firstUnit);
-            const productVariants = Array.isArray(product?.variants) ? product.variants : [];
-            const hasMultipleVariants = productVariants.length > 1;
+            const variantLabel = splitVariant ? getVariantLabel(firstVariant) : "";
 
-            const openProduct = () => navigate(`/single/${product.id}`);
+            const openProduct = () => navigate(`/single/${product.id}${firstVariant?.id ? `?variant=${firstVariant.id}` : ""}`);
             const openProductWithKeyboard = (event) => {
                 if (event.target !== event.currentTarget || (event.key !== "Enter" && event.key !== " ")) return;
                 event.preventDefault();
                 openProduct();
             };
 
-            return <article className="product_card" key={product.id} role="link" tabIndex={0} aria-label={`View ${product.name || "product"}`} onClick={openProduct} onKeyDown={openProductWithKeyboard}>
+            return <article className="product_card" key={`${product.id}-${firstVariant?.id || "default"}`} role="link" tabIndex={0} aria-label={`View ${product.name || "product"}`} onClick={openProduct} onKeyDown={openProductWithKeyboard}>
                 <div className="product_img">
                     {product.marketing_highlights?.length ? (
                         <div className="product-image-topbar">
@@ -155,28 +168,12 @@ function Product_card({ products = [], isLoading, error, page = 1, pageSize = 14
                         </button>
                     </div>
                     {hasOffer && <OfferSideRail discountType={discountType} discountValue={discountValue} percentage={product.discount_percentage} />}
-                    <button className={`favorite_btn ${isWishlisted ? "active" : ""}`} onClick={(event) => addToWishlist(product, event)} aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}><FaHeart /></button>
+                    <button className={`favorite_btn ${isWishlisted ? "active" : ""}`} onClick={(event) => addToWishlist(product, event, firstVariant)} aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}><FaHeart /></button>
                 </div>
                 <div className="product_info">
                     <span className="product-category">{product.category?.name || product.brand?.name || ""}</span>
                     <h3 className="product-title">{product.name}</h3>
-                    {hasMultipleVariants && (
-                        <div className="shop-variant-list" aria-label={`${productVariants.length} product variants`}>
-                            {productVariants.map((variant, index) => (
-                                <button
-                                    type="button"
-                                    className="shop-variant-chip"
-                                    key={variant.id || index}
-                                    onClick={(event) => {
-                                        event.stopPropagation();
-                                        navigate(`/single/${product.id}?variant=${variant.id}`);
-                                    }}
-                                >
-                                    {getVariantLabel(variant, index)}
-                                </button>
-                            ))}
-                        </div>
-                    )}
+                    {variantLabel && <span className="product-variant-label">{variantLabel}</span>}
                     <div className="product-details-bottom">
                         <ProductMessageRail messages={product.product_messages} />
                         <div className="product-footer">
