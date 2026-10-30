@@ -42,6 +42,10 @@ function getProductImage(product, variant) {
         || variant?.images?.[0]?.image;
 }
 
+function getVariantLabel(variant, index) {
+    return variant?.color?.name || variant?.sku || `Variant ${index + 1}`;
+}
+
 function getAvailability(product, variant, unit) {
     if (hasValue(product?.availability)) return String(product.availability);
     if (hasValue(product?.stock_status)) return String(product.stock_status);
@@ -120,6 +124,8 @@ function Product_card({ products = [], isLoading, error, page = 1, pageSize = 14
             const displayPrice = hasOffer && hasValue(discountedPrice) ? discountedPrice : currentPrice;
             const showOriginalPrice = hasOffer && hasValue(originalPrice) && hasValue(displayPrice) && String(originalPrice) !== String(displayPrice);
             const availability = getAvailability(product, firstVariant, firstUnit);
+            const productVariants = Array.isArray(product?.variants) ? product.variants : [];
+            const hasMultipleVariants = productVariants.length > 1;
 
             const openProduct = () => navigate(`/single/${product.id}`);
             const openProductWithKeyboard = (event) => {
@@ -154,6 +160,23 @@ function Product_card({ products = [], isLoading, error, page = 1, pageSize = 14
                 <div className="product_info">
                     <span className="product-category">{product.category?.name || product.brand?.name || ""}</span>
                     <h3 className="product-title">{product.name}</h3>
+                    {hasMultipleVariants && (
+                        <div className="shop-variant-list" aria-label={`${productVariants.length} product variants`}>
+                            {productVariants.map((variant, index) => (
+                                <button
+                                    type="button"
+                                    className="shop-variant-chip"
+                                    key={variant.id || index}
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        navigate(`/single/${product.id}?variant=${variant.id}`);
+                                    }}
+                                >
+                                    {getVariantLabel(variant, index)}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                     <div className="product-details-bottom">
                         <ProductMessageRail messages={product.product_messages} />
                         <div className="product-footer">

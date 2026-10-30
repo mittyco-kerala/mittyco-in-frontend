@@ -353,6 +353,35 @@
 
 }
 
+.shop-variant-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: -2px 0 8px;
+    min-width: 0;
+}
+
+.shop-variant-chip {
+    border: 1px solid #d7e3dd;
+    border-radius: 999px;
+    padding: 4px 8px;
+    background: #f7fbf8;
+    color: #1f5b3e;
+    cursor: pointer;
+    font: 600 10px/1.2 Inter, Arial, sans-serif;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.shop-variant-chip:hover,
+.shop-variant-chip:focus-visible {
+    border-color: #1f5b3e;
+    background: #eaf4ed;
+    outline: none;
+}
+
 
 .product-footer {
     display: flex;
