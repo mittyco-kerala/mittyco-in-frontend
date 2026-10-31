@@ -1012,6 +1012,32 @@ box-shadow:0 0 0 4px rgba(255,144,0,.10);
 
 }
 
+.delivery-location-row{
+display:flex;
+align-items:center;
+gap:12px;
+margin-bottom:18px;
+}
+
+.location-button{
+display:inline-flex;
+align-items:center;
+gap:8px;
+min-height:42px;
+padding:0 14px;
+border:1px solid #1F5B3E;
+border-radius:10px;
+background:#fff;
+color:#1F5B3E;
+font-weight:600;
+cursor:pointer;
+}
+
+.delivery-location-row small{
+color:#6b7280;
+line-height:1.4;
+}
+
 
 /*=========================================
         DEFAULT CHECKBOX

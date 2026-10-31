@@ -38,6 +38,8 @@ const Profile = () => {
     city: "",
     postal_code: "",
     country: "India",
+    latitude: "",
+    longitude: "",
     is_default: false
   });
 
@@ -102,6 +104,8 @@ const Profile = () => {
       city: "",
       postal_code: "",
       country: "India",
+      latitude: "",
+      longitude: "",
       is_default: false
     });
 
@@ -205,12 +209,34 @@ const Profile = () => {
       city: address.city || "",
       postal_code: address.postal_code || "",
       country: address.country || "India",
+      latitude: address.latitude ?? "",
+      longitude: address.longitude ?? "",
       is_default: address.is_default
     });
 
     setShowModal(true);
 
   };
+  const captureDeliveryLocation = () => {
+    if (!navigator.geolocation) {
+      showToast.error("This browser does not support delivery location.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        setAddressData((current) => ({
+          ...current,
+          latitude: coords.latitude.toFixed(6),
+          longitude: coords.longitude.toFixed(6),
+        }));
+        showToast.success("Delivery location captured.");
+      },
+      () => showToast.error("Allow location access to calculate local delivery."),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  };
+
   const updateAddress = async () => {
 
     try {
@@ -875,6 +901,19 @@ const Profile = () => {
                   onChange={handleAddressChange}
                   required
                 />
+
+                <div className="delivery-location-row">
+                  <button
+                    type="button"
+                    className="location-button"
+                    onClick={captureDeliveryLocation}
+                  >
+                    <FaMapMarkerAlt /> Use delivery location
+                  </button>
+                  <small>
+                    Required for free delivery within 5 km. Coordinates are saved with this address.
+                  </small>
+                </div>
 
                 <label className="default-check">
 

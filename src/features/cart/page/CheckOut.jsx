@@ -564,7 +564,9 @@ const Checkout = () => {
 
                                 {shippingQuote?.weight_grams ? (
                                     <small>
-                                        India Post · {shippingQuote.weight_grams} g
+                                        {shippingQuote.free_delivery
+                                            ? `Local delivery · within ${shippingQuote.free_delivery_radius_km || 5} km`
+                                            : `India Post · ${shippingQuote.weight_grams} g`}
                                     </small>
                                 ) : null}
 
