@@ -14,6 +14,7 @@ import { formatOfferLabel, getHomepageProductPricing } from "../utils/productPri
 import ProductHighlightRail from "./ProductHighlightRail";
 import ProductMessageRail from "./ProductMessageRail";
 import OfferSideRail from "./OfferSideRail";
+import { getProductUrl } from "../../../utils/productUrl";
 
 const MAX_PRODUCTS_PER_SECTION = 16;
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
@@ -142,7 +143,7 @@ function New_Arrival_Home({
 
                             return (
                                 <article key={item.id} className="new-product-card">
-                                    <div className="image-container" onClick={() => navigate(`/single/${item.id}`)} role="button" tabIndex={0} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") navigate(`/single/${item.id}`); }}>
+                                    <div className="image-container" onClick={() => navigate(getProductUrl(item, variant, size))} role="button" tabIndex={0} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") navigate(getProductUrl(item, variant, size)); }}>
                                         {(item.marketing_highlights?.length || (showNewBadge && item.is_active)) ? (
                                             <div className="product-image-topbar">
                                                 <ProductHighlightRail highlights={item.marketing_highlights} placement="badge" />
@@ -151,7 +152,7 @@ function New_Arrival_Home({
                                         ) : null}
                                         <div className="product-image-stage">
                                             <img src={image ? getImageUrl(image) : undefined} alt={item.name} className="product-img" />
-                                            <button type="button" className="quick-add-btn" onClick={(event) => { event.stopPropagation(); navigate(`/single/${item.id}`); }}>VIEW PRODUCT</button>
+                                            <button type="button" className="quick-add-btn" onClick={(event) => { event.stopPropagation(); navigate(getProductUrl(item, variant, size)); }}>VIEW PRODUCT</button>
                                         </div>
                                         {hasOffer && <OfferSideRail discountType={discountType} discountValue={discountValue} percentage={discountPercentage} />}
                                         <button type="button" className={`wishlist-btn ${isWishlisted ? "is-wishlisted" : ""}`} onClick={(event) => addToWishlist(item, event)} aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}>{isWishlisted ? <FaHeart className="heart-icon" /> : <FaRegHeart className="heart-icon" />}</button>

@@ -13,6 +13,7 @@ import ProductHighlightRail from "../../home/components/ProductHighlightRail";
 import ProductMessageRail from "../../home/components/ProductMessageRail";
 import OfferSideRail from "../../home/components/OfferSideRail";
 import { formatOfferLabel } from "../../home/utils/productPricing";
+import { getProductUrl } from "../../../utils/productUrl";
 
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
 
@@ -140,7 +141,7 @@ function Product_card({ products = [], isLoading, error, page = 1, pageSize = 14
             const availability = getAvailability(product, firstVariant, firstUnit);
             const variantLabel = splitVariant ? getVariantLabel(firstVariant) : "";
 
-            const openProduct = () => navigate(`/single/${product.id}${firstVariant?.id ? `?variant=${firstVariant.id}` : ""}`);
+            const openProduct = () => navigate(getProductUrl(product, firstVariant, firstUnit));
             const openProductWithKeyboard = (event) => {
                 if (event.target !== event.currentTarget || (event.key !== "Enter" && event.key !== " ")) return;
                 event.preventDefault();

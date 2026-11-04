@@ -37,6 +37,7 @@ import {
 import ProductCouponInput from "../../coupon/components/ProductCouponInput";
 import { hasAuthSession } from "../../auth/authUtils";
 import DirhamAmount from "../../../components/DirhamAmount";
+import { getProductUrl } from "../../../utils/productUrl";
 
 function getDescriptionText(value) {
     if (Array.isArray(value)) return value.filter(Boolean).join("\n").trim();
@@ -1033,7 +1034,7 @@ function Single_product() {
                             const relatedProductId = product?.id ?? product?.pk ?? product?.uuid;
                             const image = relatedProductImage(product);
                             return (
-                                <NavLink className="product-related-product-card" to={`/single/${relatedProductId}`} key={relatedProductId}>
+                                <NavLink className="product-related-product-card" to={getProductUrl(product, product?.variants?.[0], product?.variants?.[0]?.sizes?.[0])} key={relatedProductId}>
                                     <div className="product-related-product-image">
                                         <img src={image ? getImageUrl(image) : defaultImage} alt={product?.name || "Related product"} onError={(event) => { event.currentTarget.src = defaultImage; }} />
                                     </div>

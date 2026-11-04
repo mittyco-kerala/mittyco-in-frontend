@@ -7,6 +7,7 @@ import { AiOutlineDoubleRight } from "react-icons/ai";
 import showToast from "../../../utils/toast";
 import { getImageUrl } from "../../../utils/imageUrl";
 import DirhamAmount from "../../../components/DirhamAmount";
+import { getProductUrl } from "../../../utils/productUrl";
 
 
 
@@ -132,9 +133,16 @@ export default function Wishlist() {
 
                             </div>
 
-                            <button onClick={() => navigate(
-                                `/single/${item.product}?variant=${item.variant}&size=${item.variant_size}`
-                            )}>View More</button>
+                            <button onClick={() => navigate(getProductUrl(
+                                { id: item.product, name: item.product_name },
+                                { id: item.variant, color: item.color },
+                                {
+                                    id: item.variant_size,
+                                    unit: item.size,
+                                    unit_type: item.unit_type,
+                                    price: item.original_price ?? item.discounted_price,
+                                },
+                            ))}>View More</button>
 
                         </div>
 
