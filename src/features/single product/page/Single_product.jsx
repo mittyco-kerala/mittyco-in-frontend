@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import { AiOutlineDoubleRight, AiOutlineEye, AiOutlineCheckCircle, AiOutlineLock, AiOutlineLeft, AiOutlineRight, AiOutlineDown, AiOutlineUp } from "react-icons/ai";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { FiShare2 } from "react-icons/fi";
 import GetSingle_product_Query from "../queries/GetSingle_product_Query";
 import Cart_query from "../../cart/queries/Cart_query";
 import { addToCart_Post } from "../api/AddToCart_Api";
@@ -456,6 +457,73 @@ function Single_product() {
     const displayImages =
         selectedVariant?.images || [];
 
+    const shareProduct = async () => {
+        const productUrl = window.location.href;
+        const title = data?.name || "Mittyco product";
+        const text = `Check out ${title}`;
+        const imageValue =
+            activeImage ||
+            displayImages.find((img) => img.is_primary)?.image ||
+            displayImages[0]?.image;
+        const imageUrl = imageValue ? getImageUrl(imageValue) : "";
+
+        const copyProductUrl = async () => {
+            if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(productUrl);
+                return;
+            }
+
+            const textarea = document.createElement("textarea");
+            textarea.value = productUrl;
+            textarea.style.position = "fixed";
+            textarea.style.opacity = "0";
+            document.body.appendChild(textarea);
+            textarea.select();
+            const copied = document.execCommand("copy");
+            textarea.remove();
+            if (!copied) throw new Error("Unable to copy product link");
+        };
+
+        try {
+            if (navigator.share) {
+                const shareData = { title, text, url: productUrl };
+
+                if (navigator.canShare && imageUrl) {
+                    try {
+                        const response = await fetch(imageUrl, { credentials: "omit" });
+                        const blob = await response.blob();
+                        const extension = blob.type?.split("/")[1] || "jpg";
+                        const file = new File(
+                            [blob],
+                            `${data?.id || data?.product_id || "product"}.${extension}`,
+                            { type: blob.type || "image/jpeg" }
+                        );
+                        if (navigator.canShare({ files: [file] })) {
+                            shareData.files = [file];
+                        }
+                    } catch {
+                        // URL-only sharing remains available when the image cannot be attached.
+                    }
+                }
+
+                await navigator.share(shareData);
+                return;
+            }
+
+            await copyProductUrl();
+            showToast.success("Product link copied");
+        } catch (error) {
+            if (error?.name === "AbortError") return;
+
+            try {
+                await copyProductUrl();
+                showToast.success("Product link copied");
+            } catch {
+                showToast.warning("Unable to share product link");
+            }
+        }
+    };
+
     const cartItem = cart?.items?.find(item => 
         item.variant === selectedVariant?.id && 
         (selectedVariant?.price_type === 'single' || item.variant_size === selectedSizeVariant?.id)
@@ -659,9 +727,29 @@ function Single_product() {
                 <div className="gallery-section">
                     <div className="main-image-wrapper">
                         <div className="main-image" style={{ cursor: 'pointer' }}>
-                            <button className="wishlist-icon" onClick={(e) => { e.stopPropagation(); addToWishlist(); }}>
-                                {isWishlisted ? <FaHeart color="#fd0707ff" /> : <FaRegHeart color="#1F5B3E" />}
-                            </button>
+                            <div className="product-image-actions">
+                                <button
+                                    className="wishlist-icon"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        addToWishlist();
+                                    }}
+                                >
+                                    {isWishlisted ? <FaHeart color="#fd0707ff" /> : <FaRegHeart color="#1F5B3E" />}
+                                </button>
+                                <button
+                                    type="button"
+                                    className="share-product-button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        shareProduct();
+                                    }}
+                                    aria-label="Share product"
+                                >
+                                    <FiShare2 aria-hidden="true" />
+                                    <span>Share</span>
+                                </button>
+                            </div>
                             <img
                                 onClick={() => {
                                     const index = displayImages.findIndex(img => img.image === activeImage);
