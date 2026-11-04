@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import "../style/Single_product.css";
 import {
@@ -37,7 +37,7 @@ import {
 import ProductCouponInput from "../../coupon/components/ProductCouponInput";
 import { hasAuthSession } from "../../auth/authUtils";
 import DirhamAmount from "../../../components/DirhamAmount";
-import { getProductUrl } from "../../../utils/productUrl";
+import { getProductShareUrl, getProductUrl } from "../../../utils/productUrl";
 
 function getDescriptionText(value) {
     if (Array.isArray(value)) return value.filter(Boolean).join("\n").trim();
@@ -187,6 +187,14 @@ function Single_product() {
     const couponRequestPending = useRef(false);
 
     const productId = data?.id || id;
+
+    const replaceProductUrl = useCallback((variant, unit = null) => {
+        if (!data?.id || !variant) return;
+
+        const nextUrl = getProductUrl(data, variant, unit);
+        const currentUrl = `${window.location.pathname}${window.location.search}`;
+        if (currentUrl !== nextUrl) navigate(nextUrl, { replace: true });
+    }, [data, navigate]);
 
     const { data: relatedProductsResponse } = useQuery({
         queryKey: ["related-products", id],
@@ -414,6 +422,7 @@ function Single_product() {
                 setActiveImage(
                     image?.image
                 );
+                replaceProductUrl(variant, size);
                 return;
             }
         }
@@ -428,9 +437,10 @@ function Single_product() {
             firstVariant.color
         );
 
-        setSelectedSize(
-            null
-        );
+        const firstSize = firstVariant.price_type === "multiple"
+            ? firstVariant.sizes?.[0]
+            : null;
+        setSelectedSize(firstSize ? (firstSize.unit || firstSize.size) : null);
 
         const image = firstVariant.images.find(img => img.is_primary) || firstVariant.images[0];
 
@@ -438,10 +448,13 @@ function Single_product() {
             image?.image || null
         );
 
+        replaceProductUrl(firstVariant, firstSize);
+
     }, [
         data,
         variantId,
-        sizeId
+        sizeId,
+        replaceProductUrl,
     ]);
 
     const colorlessVariants = (data?.variants || []).filter((variant) => !variant.color);
@@ -459,11 +472,15 @@ function Single_product() {
         selectedVariant?.images || [];
 
     const shareProduct = async () => {
-        const productUrl = window.location.href;
+        const shareUnit = selectedSizeVariant || selectedVariant?.sizes?.[0] || null;
+        const productUrl = getProductShareUrl(data, selectedVariant, shareUnit, window.location.origin);
         const title = data?.name || "Mittyco product";
         const text = `Check out ${title}`;
+        const activeVariantImage = activeImage && displayImages.some((image) => image.image === activeImage)
+            ? activeImage
+            : null;
         const imageValue =
-            activeImage ||
+            activeVariantImage ||
             displayImages.find((img) => img.is_primary)?.image ||
             displayImages[0]?.image;
         const imageUrl = imageValue ? getImageUrl(imageValue) : "";
@@ -746,9 +763,9 @@ function Single_product() {
                                         shareProduct();
                                     }}
                                     aria-label="Share product"
+                                    title="Share product"
                                 >
                                     <FiShare2 aria-hidden="true" />
-                                    <span>Share</span>
                                 </button>
                             </div>
                             <img
@@ -822,9 +839,13 @@ function Single_product() {
                                             const variant = data.variants.find(item => item.color?.id === color.id);
                                             setSelectedVariantId(variant?.id || null);
                                             setSelectedColor(color);
-                                            setSelectedSize(null);
+                                            const firstSize = variant?.price_type === "multiple"
+                                                ? variant.sizes?.[0]
+                                                : null;
+                                            setSelectedSize(firstSize ? (firstSize.unit || firstSize.size) : null);
                                             const image = variant?.images?.find(img => img.is_primary) || variant?.images?.[0];
                                             setActiveImage(image?.image || null);
+                                            replaceProductUrl(variant, firstSize);
                                         }}
                                     >
                                         {img ? <img src={getImageUrl(img)} alt={color.name} /> : <div className="fallback-color" style={{ background: color.code }} />}
@@ -845,14 +866,17 @@ function Single_product() {
                                             key={item.id}
                                             className={selectedSize?.id === unitObj.id ? "size-btn active-size" : "size-btn"}
                                             onClick={() => {
+                                                let nextVariant = selectedVariant;
                                                 if (item.__variantId && String(item.__variantId) !== String(selectedVariant?.id)) {
                                                     const unitVariant = data.variants.find((variant) => String(variant.id) === String(item.__variantId));
+                                                    nextVariant = unitVariant || selectedVariant;
                                                     setSelectedVariantId(item.__variantId);
                                                     setSelectedColor(unitVariant?.color || null);
                                                     const image = unitVariant?.images?.find((img) => img.is_primary) || unitVariant?.images?.[0];
                                                     setActiveImage(image?.image || null);
                                                 }
                                                 setSelectedSize(unitObj);
+                                                replaceProductUrl(nextVariant, item);
                                             }}
                                         >
                                             {unitObj.name}

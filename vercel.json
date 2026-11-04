@@ -2,6 +2,32 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
+      "source": "/single/:id",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": {
+            "re": ".*(WhatsApp|whatsapp|FacebookExternalHit|facebookexternalhit|Facebot|facebot|Twitterbot|twitterbot|LinkedInBot|linkedinbot|TelegramBot|telegrambot|Discordbot|discordbot|Slackbot|slackbot).*"
+          }
+        }
+      ],
+      "destination": "/api/product-share?id=:id&slug=product"
+    },
+    {
+      "source": "/single/:id/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": {
+            "re": ".*(WhatsApp|whatsapp|FacebookExternalHit|facebookexternalhit|Facebot|facebot|Twitterbot|twitterbot|LinkedInBot|linkedinbot|TelegramBot|telegrambot|Discordbot|discordbot|Slackbot|slackbot).*"
+          }
+        }
+      ],
+      "destination": "/api/product-share?id=:id&slug=:slug"
+    },
+    {
       "source": "/backend/media/:path*",
       "destination": "https://api.13.205.48.46.nip.io/media/:path*"
     },

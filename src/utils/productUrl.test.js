@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getProductPath, getProductUrl } from "./productUrl";
+import { getProductPath, getProductShareUrl, getProductUrl } from "./productUrl";
 
 describe("product URLs", () => {
     it("includes the product name, colour, unit, and unit price in the path", () => {
@@ -22,6 +22,9 @@ describe("product URLs", () => {
         );
         expect(getProductUrl(product, variant, unit)).toBe(
             "/single/42/cold-pressed-coconut-oil-natural-volume-1-l-price-25-50?variant=7&size=9",
+        );
+        expect(getProductShareUrl(product, variant, unit, "https://mittycofoods.com")).toBe(
+            "https://mittycofoods.com/single/42/cold-pressed-coconut-oil-natural-volume-1-l-price-25-50?variant=7&size=9",
         );
     });
 

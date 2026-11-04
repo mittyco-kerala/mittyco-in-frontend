@@ -76,3 +76,8 @@ export function getProductUrl(product = {}, variant = null, unit = null) {
     const query = params.toString();
     return query ? `${path}?${query}` : path;
 }
+
+export function getProductShareUrl(product = {}, variant = null, unit = null, origin = "") {
+    const path = getProductUrl(product, variant, unit);
+    return origin ? new URL(path, origin).toString() : path;
+}

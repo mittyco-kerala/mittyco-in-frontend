@@ -959,9 +959,10 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    width: 36px;
+    min-width: 36px;
     min-height: 36px;
-    padding: 7px 11px;
+    padding: 7px;
     border: 1px solid rgba(31, 91, 62, 0.2);
     border-radius: 999px;
     background: #fff;
@@ -991,8 +992,9 @@
     }
 
     .share-product-button {
+        width: 32px;
+        min-width: 32px;
         min-height: 32px;
-        padding: 6px 9px;
-        font-size: 12px;
+        padding: 6px;
     }
 }
