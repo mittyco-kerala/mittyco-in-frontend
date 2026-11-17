@@ -206,7 +206,7 @@ const Checkout = () => {
                 razorpay.open();
             });
 
-            showToast.success("Razorpay test payment successful. Order placed.");
+            showToast.success("Razorpay payment successful. Order placed.");
             setProcessing(false);
             navigate(`/payment-success?provider=razorpay&order_id=${encodeURIComponent(response.data?.razorpay_order_id || checkout.razorpay_order_id)}`);
 
@@ -256,7 +256,7 @@ const Checkout = () => {
 
                 <p className="mittyco-checkout-subtitle">
 
-                    Pay securely online using Razorpay test mode.
+                    Pay securely online using Razorpay.
 
                 </p>
 
@@ -392,7 +392,7 @@ const Checkout = () => {
 
                             <p>
 
-                                Pay securely with Razorpay. Test mode is currently enabled.
+                                Pay securely with Razorpay.
 
                             </p>
 
@@ -406,7 +406,7 @@ const Checkout = () => {
                                 />
                                 <span>
                                     <strong>Pay online with Razorpay</strong>
-                                    <small>Test mode only — no real money is charged.</small>
+                                    <small>Choose your preferred payment method securely.</small>
                                 </span>
                             </label>
 
@@ -628,7 +628,7 @@ const Checkout = () => {
 
                                     :
 
-                                    "Pay with Razorpay (Test)"
+                                    "Pay with Razorpay"
 
                             }
 
@@ -636,7 +636,7 @@ const Checkout = () => {
 
                         <p className="mittyco-payment-note">
 
-                            Use Razorpay test credentials to complete a simulated payment.
+                            Complete your payment securely through Razorpay.
 
                         </p>
 
