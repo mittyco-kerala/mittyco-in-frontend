@@ -6,7 +6,7 @@ import { ConfirmDialog, DataTable, DebouncedSearch, EmptyState, ErrorState, Filt
 import useAdminResource from "../hooks/useAdminResource";
 import OverviewGraphs from "../components/OverviewGraphs";
 import useFormErrors from "../hooks/useFormErrors";
-import { createResource, deleteResource, duplicateResource, getErrorMessage, getFieldSchema, getOrderDetails, getResource, listResource, unwrapList, updateOrderDetails, updateResource } from "../services/adminApi";
+import { assignProdinentBarcode, bookProdinentShipment, createResource, deleteResource, downloadProdinentLabel, duplicateResource, getErrorMessage, getFieldSchema, getOrderDetails, getResource, listResource, refreshProdinentTracking, syncProdinentOrder, unwrapList, updateOrderDetails, updateResource } from "../services/adminApi";
 import ProductView from "./ProductView";
 import ProductEditor from "./ProductEditor";
 import HeroBannerEditor from "./HeroBannerEditor";
@@ -47,7 +47,7 @@ const resources = {
     carts: { label: "Carts", group: "Customers", fields: ["user", "variant", "variant_unit", "quantity", "coupon"], columns: ["user", "variant", "variant_unit", "quantity"] },
     addresses: { label: "Addresses", group: "Customers", fields: ["user", "full_name", "phone", "address_line", "city", "postal_code", "country", "is_default"], columns: ["user", "full_name", "phone", "city", "postal_code", "is_default"] },
     "user-profiles": { label: "User Profiles", group: "Customers", fields: ["user", "phone", "date_of_birth", "gender"], columns: ["user", "phone", "date_of_birth", "gender"] },
-    orders: { label: "Orders", group: "Orders", fields: ["user", "address", "customer_name", "subtotal", "discount_amount", "shipping_charge", "total_amount", "payment_status", "status", "created_at"], columns: ["customer_name", "total_amount", "payment_status", "status", "created_at"] },
+    orders: { label: "Orders", group: "Orders", fields: ["user", "address", "customer_name", "subtotal", "discount_amount", "shipping_charge", "total_amount", "payment_status", "status", "prodinent_status", "prodinent_article_id", "created_at"], columns: ["customer_name", "total_amount", "payment_status", "status", "prodinent_status", "prodinent_article_id", "created_at"] },
     "order-items": { label: "Order Items", group: "Orders", fields: ["order", "product", "color", "unit", "quantity", "original_price", "variant_unit", "discount_amount", "price", "total_price"], columns: ["order", "product", "quantity", "price", "total_price"] },
     "hero-banners": { label: "Hero Banners", group: "Marketing", fields: ["subtitle", "title", "description", "image", "button_text", "display_order", "is_active"], columns: ["subtitle", "title", "button_text", "display_order", "is_active"] },
     "promo-banners": { label: "Promotional Banners", group: "Marketing", fields: ["image", "link", "is_active"], columns: ["image", "link", "is_active"] },
@@ -906,17 +906,85 @@ function OrderDetail({ id }) {
 }
 
 function OrderDetailContent({ order, id, navigate }) {
+    const [currentOrder, setCurrentOrder] = useState(order);
+    const [shipmentAction, setShipmentAction] = useState("");
+    const [shipmentError, setShipmentError] = useState("");
     const items = order.items || order.order_items || [];
-    const shippingLines = [order.address_name, order.address_line, order.city, order.postcode, order.country].filter(Boolean);
+    const shippingLines = [currentOrder.address_name, currentOrder.address_line, currentOrder.city, currentOrder.postcode, currentOrder.country].filter(Boolean);
     const lineTotal = (item) => item.total_price ?? Number(item.price || 0) * Number(item.quantity || 0);
+    const runShipmentAction = async (name, request, successMessage) => {
+        setShipmentAction(name);
+        setShipmentError("");
+        try {
+            const response = await request(currentOrder.id);
+            if (response?.data) setCurrentOrder((current) => ({ ...current, ...response.data }));
+            toast.success(successMessage);
+        } catch (error) {
+            const message = getErrorMessage(error, "Could not update the Post Office shipment.");
+            setShipmentError(message);
+            toast.error(message);
+        } finally {
+            setShipmentAction("");
+        }
+    };
+    const downloadLabel = async () => {
+        setShipmentAction("label");
+        setShipmentError("");
+        try {
+            const response = await downloadProdinentLabel(currentOrder.id);
+            const blob = response.data instanceof Blob
+                ? response.data
+                : new Blob([response.data], { type: "application/pdf" });
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement("a");
+            anchor.href = url;
+            anchor.download = `ORD-${String(currentOrder.id).padStart(6, "0")}-label.pdf`;
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+            URL.revokeObjectURL(url);
+            toast.success("Shipping label downloaded");
+        } catch (error) {
+            const message = getErrorMessage(error, "Shipping label is not available yet.");
+            setShipmentError(message);
+            toast.error(message);
+        } finally {
+            setShipmentAction("");
+        }
+    };
+    const providerStatus = currentOrder.prodinent_status || "Not synced";
+    const canSync = !currentOrder.prodinent_order_id && currentOrder.payment_status === "Paid";
+    const canAssign = Boolean(currentOrder.prodinent_order_id) && !currentOrder.prodinent_article_id;
+    const canBook = Boolean(currentOrder.prodinent_order_id)
+        && !["Manifested", "Delivered", "Cancelled"].includes(currentOrder.prodinent_status);
+    const canLabel = Boolean(currentOrder.prodinent_order_id && (currentOrder.prodinent_article_id || currentOrder.prodinent_label_available));
     return <div className="admin-page">
         <button className="admin-back-link" onClick={() => navigate("/mittyco-dashboard/orders")}>Back to orders</button>
-        <PageHeader eyebrow="ORDER DETAILS" title={order.order_number || order.order_id || `Order #${id}`} description={`Created ${date(order.created_at || order.date)}. Read-only order details.`} action={<div className="order-detail-actions"><button type="button" className="admin-button secondary" onClick={() => navigate(`/mittyco-dashboard/packaging-slip/${order.id}`)}><FiPackage /> Packaging slip</button>{order.invoice ? <button type="button" className="admin-button primary" onClick={() => navigate(`/mittyco-dashboard/invoice/${order.id}`)}><FiFileText /> View invoice</button> : null}</div>} />
+        <PageHeader eyebrow="ORDER DETAILS" title={currentOrder.order_number || currentOrder.order_id || `Order #${id}`} description={`Created ${date(currentOrder.created_at || currentOrder.date)}. Read-only order details.`} action={<div className="order-detail-actions"><button type="button" className="admin-button secondary" onClick={() => navigate(`/mittyco-dashboard/packaging-slip/${currentOrder.id}`)}><FiPackage /> Packaging slip</button>{currentOrder.invoice ? <button type="button" className="admin-button primary" onClick={() => navigate(`/mittyco-dashboard/invoice/${currentOrder.id}`)}><FiFileText /> View invoice</button> : null}</div>} />
         <div className="admin-detail-grid">
-            <DetailCard title="Customer" icon={<FiUsers />}><strong>{order.customer_name || "Guest customer"}</strong><span>{order.customer_email || "No email provided"}</span></DetailCard>
+            <DetailCard title="Customer" icon={<FiUsers />}><strong>{currentOrder.customer_name || "Guest customer"}</strong><span>{currentOrder.customer_email || "No email provided"}</span></DetailCard>
             <DetailCard title="Shipping address" icon={<FiTruck />}>{shippingLines.length ? shippingLines.map((line, index) => <span key={`${line}-${index}`}>{line}</span>) : <span>No shipping address provided</span>}</DetailCard>
-            <DetailCard title="Status & payment" icon={<FiCreditCard />}><span>Order <StatusPill value={order.status} /></span><span>Payment <StatusPill value={order.payment_status} /></span><span>Method <strong>{order.payment_method || "Not recorded"}</strong></span></DetailCard>
+            <DetailCard title="Status & payment" icon={<FiCreditCard />}><span>Order <StatusPill value={currentOrder.status} /></span><span>Payment <StatusPill value={currentOrder.payment_status} /></span><span>Method <strong>{currentOrder.payment_method || "Not recorded"}</strong></span></DetailCard>
         </div>
+        <section className="admin-panel prodinent-shipment-panel" aria-labelledby="prodinent-shipment-heading">
+            <div className="admin-panel-heading"><div><h3 id="prodinent-shipment-heading">Post Office shipment</h3><p>Barcode, booking, label, and tracking are managed through Prodinent.</p></div><FiTruck /></div>
+            <div className="prodinent-shipment-body">
+                <div className="prodinent-shipment-grid">
+                    <div><small>Provider status</small><strong>{providerStatus}</strong></div>
+                    <div><small>Prodinent order</small><strong>{currentOrder.prodinent_order_id || "Not created"}</strong></div>
+                    <div><small>Article / barcode</small><strong>{currentOrder.prodinent_article_id || "Not assigned"}</strong></div>
+                    <div><small>Tracking</small>{currentOrder.prodinent_tracking_link ? <a href={currentOrder.prodinent_tracking_link} target="_blank" rel="noreferrer">Open tracking</a> : <strong>Not available</strong>}</div>
+                </div>
+                {shipmentError && <p className="admin-form-error" role="alert">{shipmentError}</p>}
+                <div className="prodinent-shipment-actions">
+                    {canSync && <button type="button" className="admin-button secondary" onClick={() => runShipmentAction("sync", syncProdinentOrder, "Order synced to Prodinent")} disabled={Boolean(shipmentAction)}><FiRefreshCw /> {shipmentAction === "sync" ? "Syncing..." : "Sync order"}</button>}
+                    {canAssign && <button type="button" className="admin-button secondary" onClick={() => runShipmentAction("barcode", assignProdinentBarcode, "Barcode assigned")} disabled={Boolean(shipmentAction)}><FiTag /> {shipmentAction === "barcode" ? "Assigning..." : "Assign barcode"}</button>}
+                    {canBook && <button type="button" className="admin-button primary" onClick={() => runShipmentAction("book", bookProdinentShipment, "Shipment booked")} disabled={Boolean(shipmentAction)}><FiTruck /> {shipmentAction === "book" ? "Booking..." : "Book shipment"}</button>}
+                    {canLabel && <button type="button" className="admin-button secondary" onClick={downloadLabel} disabled={Boolean(shipmentAction)}><FiDownload /> {shipmentAction === "label" ? "Preparing..." : "Download label"}</button>}
+                    {currentOrder.prodinent_order_id && <button type="button" className="admin-button secondary" onClick={() => runShipmentAction("track", refreshProdinentTracking, "Tracking refreshed")} disabled={Boolean(shipmentAction)}><FiRefreshCw /> {shipmentAction === "track" ? "Refreshing..." : "Refresh tracking"}</button>}
+                </div>
+            </div>
+        </section>
         <div className="admin-panel order-items-panel">
             <div className="admin-panel-heading"><div><h3>Order items</h3><p>Product, quantity, pricing, and stock unit details</p></div><FiBox /></div>
             {items.length ? <div className="order-item-list">{items.map((item, index) => <div className="order-item" key={item.id || index}>
@@ -924,7 +992,7 @@ function OrderDetailContent({ order, id, navigate }) {
                 <div><strong>{item.product_name || item.name || recordLabel(item.product) || "Product"}</strong><span>Qty {item.quantity ?? 0}{item.color ? ` · ${item.color}` : ""}{item.size ? ` · ${item.size}` : ""}{item.unit_type ? ` · ${item.unit_type}` : ""}</span><small>Unit price {money(item.price)}{item.original_price !== undefined && <> · Original {money(item.original_price)}</>}{item.discount_amount !== undefined && <> · Discount {money(item.discount_amount)}</>}</small></div>
                 <strong>{money(lineTotal(item))}</strong>
             </div>)}</div> : <EmptyState title="No order items" />}
-            <div className="order-total"><span>Subtotal <strong>{money(order.subtotal)}</strong></span><span>Discount <strong><DirhamAmount value={-Number(order.discount_amount || 0)} useGrouping /></strong></span><span>Shipping <strong>{Number(order.shipping_charge || 0) === 0 ? "Free" : money(order.shipping_charge)}</strong></span><span className="total"><b>Total</b><strong>{money(order.total_amount)}</strong></span></div>
+            <div className="order-total"><span>Subtotal <strong>{money(currentOrder.subtotal)}</strong></span><span>Discount <strong><DirhamAmount value={-Number(currentOrder.discount_amount || 0)} useGrouping /></strong></span><span>Shipping <strong>{Number(currentOrder.shipping_charge || 0) === 0 ? "Free" : money(currentOrder.shipping_charge)}</strong></span><span className="total"><b>Total</b><strong>{money(currentOrder.total_amount)}</strong></span></div>
         </div>
     </div>;
 }

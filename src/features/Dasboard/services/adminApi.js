@@ -46,6 +46,21 @@ export const blacklistToken = (id) =>
 export const getOrderDetails = (id) => client.get(`/orders/${id}/`);
 export const updateOrderDetails = (id, data) => client.patch(`/orders/${id}/`, data);
 
+export const syncProdinentOrder = (id) =>
+    client.post(`${resourceUrl("orders", id)}prodinent-sync/`);
+
+export const assignProdinentBarcode = (id) =>
+    client.post(`${resourceUrl("orders", id)}prodinent-barcode/`);
+
+export const bookProdinentShipment = (id) =>
+    client.post(`${resourceUrl("orders", id)}prodinent-book/`);
+
+export const refreshProdinentTracking = (id) =>
+    client.post(`${resourceUrl("orders", id)}prodinent-track/`);
+
+export const downloadProdinentLabel = (id) =>
+    client.get(`${resourceUrl("orders", id)}prodinent-label/`, { responseType: "blob" });
+
 export const unwrapList = (payload) => {
     if (Array.isArray(payload)) return { rows: payload, count: payload.length };
     const rows = payload?.results || [];
