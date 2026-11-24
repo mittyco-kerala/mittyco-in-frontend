@@ -1,28 +1,31 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import picklePoster from "../../../assets/mittyco/pickle-range.jpeg";
 import coconutPoster from "../../../assets/mittyco/coconut-oil-cold.jpeg";
-import kitchenPoster from "../../../assets/mittyco/garlic-pickle-product.jpeg";
+import homePicklePoster from "../../../assets/mittyco/mittyco-home-pickle-poster.jpg";
+import homeKitchenPoster from "../../../assets/mittyco/mittyco-home-kitchen-poster.jpg";
 import "../styles/MittycoVideoSection.css";
 
 const videos = {
     kerala: {
         src: "/mittyco-videos/mittyco-coconut-oil-story.mp4",
+        type: "video/mp4",
         poster: coconutPoster,
         eyebrow: "Traditional coconut goodness",
         title: "From Kerala coconuts to every home",
         copy: "Mittyco coconut oil is prepared with care and packed in Kannur, Kerala — bringing a familiar taste and trusted quality to everyday cooking.",
     },
     pickle: {
-        src: "/mittyco-videos/mittyco-pickle-story.mp4",
-        poster: picklePoster,
+        src: "/mittyco-videos/mittyco-home-pickle.webm",
+        type: "video/webm",
+        poster: homePicklePoster,
         eyebrow: "Homemade goodness",
         title: "Pickle, jar by jar",
         copy: "Bold Kerala flavours made to bring rice, snacks, and everyday meals alive.",
     },
     kitchen: {
-        src: "/mittyco-videos/mittyco-kitchen-story.mp4",
-        poster: kitchenPoster,
+        src: "/mittyco-videos/mittyco-home-kitchen.webm",
+        type: "video/webm",
+        poster: homeKitchenPoster,
         eyebrow: "Made with care",
         title: "A taste of our kitchen",
         copy: "Simple ingredients, honest recipes, and the warmth of food prepared with patience.",
@@ -70,7 +73,7 @@ function BusinessVideo({ video, featured = false }) {
                     preload="metadata"
                     poster={video.poster}
                 >
-                    <source src={video.src} type="video/mp4" />
+                    <source src={video.src} type={video.type} />
                     Your browser does not support video playback.
                 </video>
             </div>
