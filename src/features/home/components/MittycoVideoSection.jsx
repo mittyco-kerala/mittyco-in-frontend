@@ -1,15 +1,13 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import coconutPoster from "../../../assets/mittyco/coconut-oil-cold.jpeg";
 import homePicklePoster from "../../../assets/mittyco/mittyco-home-pickle-poster.jpg";
 import homeKitchenPoster from "../../../assets/mittyco/mittyco-home-kitchen-poster.jpg";
 import "../styles/MittycoVideoSection.css";
 
 const videos = {
     kerala: {
-        src: "/mittyco-videos/mittyco-coconut-oil-story.mp4",
-        type: "video/mp4",
-        poster: coconutPoster,
+        src: "/mittyco-videos/mittyco-home-coconut-story.webp",
+        type: "image/webp",
         eyebrow: "Traditional coconut goodness",
         title: "From Kerala coconuts to every home",
         copy: "Mittyco coconut oil is prepared with care and packed in Kannur, Kerala — bringing a familiar taste and trusted quality to everyday cooking.",
@@ -34,6 +32,7 @@ const videos = {
 
 function BusinessVideo({ video, featured = false }) {
     const videoRef = useRef(null);
+    const isAnimatedImage = video.type === "image/webp";
 
     useEffect(() => {
         const videoElement = videoRef.current;
@@ -58,24 +57,35 @@ function BusinessVideo({ video, featured = false }) {
     return (
         <div className={`mittyco-story-video-card ${featured ? "mittyco-story-video-card--featured" : ""}`}>
             <div className="mittyco-story-video-frame">
-                <video
-                    ref={videoRef}
-                    className="mittyco-story-video"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    onPause={(event) => {
-                        event.currentTarget.play().catch(() => {
-                            // Autoplay can still be blocked by a browser policy.
-                        });
-                    }}
-                    preload="metadata"
-                    poster={video.poster}
-                >
-                    <source src={video.src} type={video.type} />
-                    Your browser does not support video playback.
-                </video>
+                {isAnimatedImage ? (
+                    <img
+                        className="mittyco-story-video"
+                        src={video.src}
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        decoding="async"
+                    />
+                ) : (
+                    <video
+                        ref={videoRef}
+                        className="mittyco-story-video"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        onPause={(event) => {
+                            event.currentTarget.play().catch(() => {
+                                // Autoplay can still be blocked by a browser policy.
+                            });
+                        }}
+                        preload="metadata"
+                        poster={video.poster}
+                    >
+                        <source src={video.src} type={video.type} />
+                        Your browser does not support video playback.
+                    </video>
+                )}
             </div>
             <div className="mittyco-story-video-copy">
                 <p>{video.eyebrow}</p>
