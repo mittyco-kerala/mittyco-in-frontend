@@ -22,7 +22,16 @@ const initialForm = {
     dropoff_pincode: "",
 };
 
-const serial = (value) => String(value ?? "").padStart(9, "0");
+const serial = (value) => String(value ?? "").padStart(8, "0");
+const s10Barcode = (prefix, value) => {
+    if (value == null) return "—";
+    const serialValue = serial(value);
+    const weights = [8, 6, 4, 2, 3, 5, 9, 7];
+    const remainder = [...serialValue].reduce((sum, digit, index) => sum + Number(digit) * weights[index], 0) % 11;
+    const check = 11 - remainder;
+    const checkDigit = check === 10 ? "0" : check === 11 ? "5" : String(check);
+    return `${prefix}${serialValue}${checkDigit}IN`;
+};
 
 function TextField({ label, name, value, onChange, hint, ...inputProps }) {
     return <label className="india-post-series-field">
@@ -145,8 +154,8 @@ export default function IndiaPostBarcodeSeriesPage() {
                 <TextField label="Series name" name="name" value={form.name} onChange={handleChange} placeholder="e.g. BP block Nov 2026" maxLength={80} required />
                 <TextField label="BP contract ID" name="contract_id" value={form.contract_id} onChange={handleChange} placeholder="8 digits" inputMode="numeric" pattern="[0-9]{8}" maxLength={8} required />
                 <TextField label="Barcode prefix" name="barcode_prefix" value={form.barcode_prefix} onChange={handleChange} placeholder="e.g. CX" pattern="[A-Z]{2}" maxLength={2} required hint="The two letters printed on the DOP allocated series." />
-                <TextField label="First serial number" name="first_number" value={form.first_number} onChange={handleChange} placeholder="9 digits" inputMode="numeric" pattern="[0-9]{9}" maxLength={9} required hint="First number in the allocated block, without prefix or IN." />
-                <TextField label="Last serial number" name="last_number" value={form.last_number} onChange={handleChange} placeholder="9 digits" inputMode="numeric" pattern="[0-9]{9}" maxLength={9} required hint="Inclusive last number in the approved block." />
+                <TextField label="First serial number" name="first_number" value={form.first_number} onChange={handleChange} placeholder="8 digits" inputMode="numeric" pattern="[0-9]{1,8}" maxLength={8} required hint="First allocated 8-digit serial only; omit the prefix, check digit, and IN." />
+                <TextField label="Last serial number" name="last_number" value={form.last_number} onChange={handleChange} placeholder="8 digits" inputMode="numeric" pattern="[0-9]{1,8}" maxLength={8} required hint="Inclusive last 8-digit serial in the approved block." />
             </div>
             <details className="india-post-series-optional-office">
                 <summary>Booking office details <span>Optional now; required before booking shipments</span></summary>
@@ -167,8 +176,8 @@ export default function IndiaPostBarcodeSeriesPage() {
                     const exhausted = Number(series.remaining_count) <= 0;
                     return <tr key={series.id}>
                         <td><strong>{series.name}</strong><small>BP · Contract {series.contract_id}</small></td>
-                        <td><code>{series.barcode_prefix}{serial(series.allocation_start)}IN – {series.barcode_prefix}{serial(series.last_number)}IN</code></td>
-                        <td>{exhausted ? "Exhausted" : <code>{series.barcode_prefix}{serial(series.next_number)}IN</code>}</td>
+                        <td><code>{s10Barcode(series.barcode_prefix, series.allocation_start)} – {s10Barcode(series.barcode_prefix, series.last_number)}</code></td>
+                        <td>{exhausted ? "Exhausted" : <code>{s10Barcode(series.barcode_prefix, series.next_number)}</code>}</td>
                         <td>{Number(series.remaining_count).toLocaleString("en-IN")}</td>
                         <td>{series.booking_office_name ? <><strong>{series.booking_office_name}</strong><small>ID {series.booking_office_id} · PIN {series.dropoff_pincode}</small></> : <><strong>Not set</strong><small>Add before shipment booking</small></>}</td>
                         <td><span className={`india-post-series-status ${series.is_active && !exhausted ? "active" : "paused"}`}>{exhausted ? "Exhausted" : series.is_active ? "Active" : "Paused"}</span></td>
