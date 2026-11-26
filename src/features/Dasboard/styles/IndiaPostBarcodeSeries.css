@@ -1,0 +1,36 @@
+.india-post-series-page{max-width:1440px}
+.india-post-series-notice{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;margin:0 0 16px;background:#fff7e9;border:1px solid #f0d9b6;border-radius:10px;color:#96610b}
+.india-post-series-notice>svg{flex:0 0 auto;margin-top:2px;font-size:17px}
+.india-post-series-notice div{display:flex;flex-direction:column;gap:4px}
+.india-post-series-notice strong{font-size:12px}
+.india-post-series-notice span{font-size:12px;line-height:1.5;color:#7b6d58}
+.india-post-series-form,.india-post-series-list{background:#fff;border:1px solid var(--admin-line);border-radius:12px;padding:20px;margin-bottom:16px}
+.india-post-series-section-title,.india-post-series-list-heading{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.india-post-series-icon{width:36px;height:36px;display:grid;place-items:center;border-radius:9px;background:#fff0d8;color:#b47b00}
+.india-post-series-section-title h3,.india-post-series-list-heading h3{margin:0;color:var(--admin-ink);font:700 17px Georgia,serif}
+.india-post-series-section-title p{margin:5px 0 0;color:var(--admin-muted);font-size:12px}
+.india-post-series-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.india-post-series-field{display:flex;flex-direction:column;gap:6px;color:#62767d;font-size:11px;font-weight:700}
+.india-post-series-field input{box-sizing:border-box;width:100%;min-height:39px;border:1px solid var(--admin-line);border-radius:7px;background:#fff;color:var(--admin-ink);padding:9px 10px;font:13px Inter,sans-serif;outline:0}
+.india-post-series-field input:focus{border-color:#e5b543;box-shadow:0 0 0 3px #f4c43024}
+.india-post-series-field small{color:var(--admin-muted);font-size:10px;font-weight:500;line-height:1.4}
+.india-post-series-form-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;padding-top:15px;border-top:1px solid var(--admin-line);color:var(--admin-muted);font-size:12px}
+.india-post-series-form-footer strong{color:var(--admin-ink)}
+.india-post-series-list-heading{justify-content:space-between;margin-bottom:14px}
+.india-post-series-list-heading .admin-eyebrow{margin:0 0 5px}
+.india-post-series-count{display:inline-flex;align-items:center;gap:6px;color:#887000;background:#fff5d8;border-radius:20px;padding:6px 10px;font-size:11px;font-weight:700}
+.india-post-series-table-wrap{overflow:auto}
+.india-post-series-table{width:100%;border-collapse:collapse;min-width:950px}
+.india-post-series-table th,.india-post-series-table td{padding:12px 10px;border-top:1px solid #edf1ee;text-align:left;vertical-align:middle;font-size:11px;white-space:nowrap}
+.india-post-series-table th{color:var(--admin-muted);font-size:10px;letter-spacing:.45px;text-transform:uppercase}
+.india-post-series-table td strong,.india-post-series-table td small{display:block}
+.india-post-series-table td strong{color:var(--admin-ink);font-size:11px}
+.india-post-series-table td small{margin-top:4px;color:var(--admin-muted);font-size:10px}
+.india-post-series-table code{color:#53666b;font:11px ui-monospace,SFMono-Regular,Consolas,monospace}
+.india-post-series-status{display:inline-flex;align-items:center;border-radius:16px;padding:5px 8px;font-size:10px;font-weight:700}
+.india-post-series-status.active{background:#e8f7ef;color:#32805c}
+.india-post-series-status.paused{background:#f1f3f3;color:#6f7e82}
+.india-post-series-table .admin-button{padding:7px 9px;font-size:10px}
+.india-post-series-table .admin-state{min-width:0}
+@media(max-width:1050px){.india-post-series-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.india-post-series-form,.india-post-series-list{padding:15px}.india-post-series-grid{grid-template-columns:1fr}.india-post-series-form-footer{align-items:stretch;flex-direction:column}.india-post-series-form-footer .admin-button{width:100%}.india-post-series-section-title{align-items:flex-start}.india-post-series-list-heading h3{font-size:16px}}

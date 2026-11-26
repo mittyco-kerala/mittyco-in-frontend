@@ -26,6 +26,15 @@ export const duplicateResource = (resource, id) =>
 export const setPrimaryResource = (resource, id) =>
     client.post(`${resourceUrl(resource, id)}set-primary/`);
 
+export const listIndiaPostBarcodeSeries = (params = {}) =>
+    listResource("india-post-barcode-series", params);
+
+export const createIndiaPostBarcodeSeries = (data) =>
+    createResource("india-post-barcode-series", data);
+
+export const updateIndiaPostBarcodeSeries = (id, data) =>
+    updateResource("india-post-barcode-series", id, data);
+
 export const toggleWelcomeBonusActive = (id) =>
     client.post(`${resourceUrl("welcome-bonuses", id)}toggle-active/`);
 
@@ -60,6 +69,15 @@ export const refreshProdinentTracking = (id) =>
 
 export const downloadProdinentLabel = (id) =>
     client.get(`${resourceUrl("orders", id)}prodinent-label/`, { responseType: "blob" });
+
+export const bookIndiaPostShipment = (id) =>
+    client.post(`${resourceUrl("orders", id)}india-post-book/`);
+
+export const refreshIndiaPostTracking = (id) =>
+    client.post(`${resourceUrl("orders", id)}india-post-track/`);
+
+export const downloadIndiaPostLabel = (id) =>
+    client.get(`${resourceUrl("orders", id)}india-post-label/`, { responseType: "blob" });
 
 export const unwrapList = (payload) => {
     if (Array.isArray(payload)) return { rows: payload, count: payload.length };

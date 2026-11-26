@@ -1,0 +1,150 @@
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { FiArchive, FiCheckCircle, FiPlus, FiRefreshCw, FiShield, FiTag } from "react-icons/fi";
+import { EmptyState, ErrorState, LoadingState, PageHeader } from "../components/AdminPrimitives";
+import {
+    createIndiaPostBarcodeSeries,
+    getErrorMessage,
+    listIndiaPostBarcodeSeries,
+    unwrapList,
+    updateIndiaPostBarcodeSeries,
+} from "../services/adminApi";
+import "../styles/IndiaPostBarcodeSeries.css";
+
+const initialForm = {
+    name: "",
+    contract_id: "",
+    barcode_prefix: "",
+    first_number: "",
+    last_number: "",
+    booking_office_id: "",
+    booking_office_name: "",
+    dropoff_pincode: "",
+};
+
+const serial = (value) => String(value ?? "").padStart(9, "0");
+
+function TextField({ label, name, value, onChange, hint, ...inputProps }) {
+    return <label className="india-post-series-field">
+        <span>{label}</span>
+        <input name={name} value={value} onChange={onChange} {...inputProps} />
+        {hint && <small>{hint}</small>}
+    </label>;
+}
+
+export default function IndiaPostBarcodeSeriesPage() {
+    const [rows, setRows] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [saving, setSaving] = useState(false);
+    const [busyId, setBusyId] = useState(null);
+    const [form, setForm] = useState(initialForm);
+
+    const loadSeries = useCallback(async () => {
+        setLoading(true);
+        setError("");
+        try {
+            const response = await listIndiaPostBarcodeSeries({ page_size: 100 });
+            setRows(unwrapList(response.data).rows);
+        } catch (requestError) {
+            setError(getErrorMessage(requestError, "Could not load India Post barcode series."));
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => { void loadSeries(); }, [loadSeries]);
+
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        setForm((current) => ({
+            ...current,
+            [name]: name === "barcode_prefix" ? value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 2) : value,
+        }));
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        setSaving(true);
+        try {
+            await createIndiaPostBarcodeSeries({
+                ...form,
+                article_type: "BP",
+                first_number: Number(form.first_number),
+                last_number: Number(form.last_number),
+            });
+            toast.success("India Post BP barcode series saved.");
+            setForm(initialForm);
+            await loadSeries();
+        } catch (requestError) {
+            toast.error(getErrorMessage(requestError, "Could not save the barcode series."));
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const toggleActive = async (series) => {
+        setBusyId(series.id);
+        try {
+            await updateIndiaPostBarcodeSeries(series.id, { is_active: !series.is_active });
+            toast.success(series.is_active ? "Series paused. Existing barcode history is retained." : "Series activated.");
+            await loadSeries();
+        } catch (requestError) {
+            toast.error(getErrorMessage(requestError, "Could not update the series."));
+        } finally {
+            setBusyId(null);
+        }
+    };
+
+    return <section className="admin-page india-post-series-page">
+        <PageHeader
+            eyebrow="SHIPMENTS / INDIA POST"
+            title="India Post barcode series"
+            description="Save and manage barcode blocks officially allocated for your Business Parcel contract."
+            action={<button type="button" className="admin-button secondary" onClick={loadSeries} disabled={loading}>
+                <FiRefreshCw aria-hidden="true" /> Refresh
+            </button>}
+        />
+
+        <div className="india-post-series-notice" role="note">
+            <FiShield aria-hidden="true" />
+            <div><strong>Use only a range allocated by India Post.</strong><span>Do not enter a self-created barcode range. Saved ranges are retained for audit and cannot be deleted or renumbered.</span></div>
+        </div>
+
+        <form className="admin-panel india-post-series-form" onSubmit={handleSubmit}>
+            <div className="india-post-series-section-title"><span className="india-post-series-icon"><FiPlus aria-hidden="true" /></span><div><h3>Add allocated BP series</h3><p>Enter the allocation details shown in the India Post portal or approval.</p></div></div>
+            <div className="india-post-series-grid">
+                <TextField label="Series name" name="name" value={form.name} onChange={handleChange} placeholder="e.g. BP block Nov 2026" maxLength={80} required />
+                <TextField label="BP contract ID" name="contract_id" value={form.contract_id} onChange={handleChange} placeholder="8 digits" inputMode="numeric" pattern="[0-9]{8}" maxLength={8} required />
+                <TextField label="Barcode prefix" name="barcode_prefix" value={form.barcode_prefix} onChange={handleChange} placeholder="e.g. CX" pattern="[A-Z]{2}" maxLength={2} required hint="The two letters printed on the DOP allocated series." />
+                <TextField label="First serial number" name="first_number" value={form.first_number} onChange={handleChange} placeholder="9 digits" inputMode="numeric" pattern="[0-9]{9}" maxLength={9} required hint="First number in the allocated block, without prefix or IN." />
+                <TextField label="Last serial number" name="last_number" value={form.last_number} onChange={handleChange} placeholder="9 digits" inputMode="numeric" pattern="[0-9]{9}" maxLength={9} required hint="Inclusive last number in the approved block." />
+                <TextField label="DOP booking office ID" name="booking_office_id" value={form.booking_office_id} onChange={handleChange} placeholder="8 digits" inputMode="numeric" pattern="[0-9]{8}" maxLength={8} required />
+                <TextField label="Booking office name" name="booking_office_name" value={form.booking_office_name} onChange={handleChange} placeholder="As shown by India Post" maxLength={100} required />
+                <TextField label="Drop-off PIN code" name="dropoff_pincode" value={form.dropoff_pincode} onChange={handleChange} placeholder="6 digits" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required />
+            </div>
+            <div className="india-post-series-form-footer"><span>Service: <strong>Business Parcel (BP)</strong></span><button type="submit" className="admin-button primary" disabled={saving}>{saving ? "Saving..." : <><FiPlus aria-hidden="true" /> Save series</>}</button></div>
+        </form>
+
+        <section className="admin-panel india-post-series-list" aria-labelledby="india-post-series-heading">
+            <div className="india-post-series-list-heading"><div><p className="admin-eyebrow">ALLOCATED RANGES</p><h3 id="india-post-series-heading">Saved barcode series</h3></div><span className="india-post-series-count"><FiTag aria-hidden="true" /> {rows.length}</span></div>
+            {loading ? <LoadingState label="Loading barcode series" /> : error ? <ErrorState message={error} onRetry={loadSeries} /> : rows.length === 0 ? <EmptyState title="No barcode series saved" description="Once India Post allocates a BP barcode block, add its exact range here." /> : <div className="india-post-series-table-wrap"><table className="india-post-series-table">
+                <thead><tr><th>Series / contract</th><th>Allocated range</th><th>Next unused</th><th>Remaining</th><th>Booking office</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody>{rows.map((series) => {
+                    const exhausted = Number(series.remaining_count) <= 0;
+                    return <tr key={series.id}>
+                        <td><strong>{series.name}</strong><small>BP · Contract {series.contract_id}</small></td>
+                        <td><code>{series.barcode_prefix}{serial(series.allocation_start)}IN – {series.barcode_prefix}{serial(series.last_number)}IN</code></td>
+                        <td>{exhausted ? "Exhausted" : <code>{series.barcode_prefix}{serial(series.next_number)}IN</code>}</td>
+                        <td>{Number(series.remaining_count).toLocaleString("en-IN")}</td>
+                        <td><strong>{series.booking_office_name}</strong><small>ID {series.booking_office_id} · PIN {series.dropoff_pincode}</small></td>
+                        <td><span className={`india-post-series-status ${series.is_active && !exhausted ? "active" : "paused"}`}>{exhausted ? "Exhausted" : series.is_active ? "Active" : "Paused"}</span></td>
+                        <td><button type="button" className={`admin-button ${series.is_active ? "secondary" : "primary"}`} onClick={() => void toggleActive(series)} disabled={busyId === series.id || exhausted}>
+                            {series.is_active ? <><FiArchive aria-hidden="true" /> Pause</> : <><FiCheckCircle aria-hidden="true" /> Activate</>}
+                        </button></td>
+                    </tr>;
+                })}</tbody>
+            </table></div>}
+        </section>
+    </section>;
+}
