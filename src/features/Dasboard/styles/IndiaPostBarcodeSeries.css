@@ -20,6 +20,7 @@
 .india-post-series-optional-office .india-post-series-grid{margin-top:13px}
 .india-post-series-form-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;padding-top:15px;border-top:1px solid var(--admin-line);color:var(--admin-muted);font-size:12px}
 .india-post-series-form-footer strong{color:var(--admin-ink)}
+.india-post-series-form-footer>div{display:grid;gap:5px}.india-post-series-form-footer small{max-width:640px;color:var(--admin-muted);font-size:11px;line-height:1.45}.india-post-series-form-footer small.is-single-range{color:#b45309;font-weight:700}
 .india-post-series-list-heading{justify-content:space-between;margin-bottom:14px}
 .india-post-series-list-heading .admin-eyebrow{margin:0 0 5px}
 .india-post-series-count{display:inline-flex;align-items:center;gap:6px;color:#887000;background:#fff5d8;border-radius:20px;padding:6px 10px;font-size:11px;font-weight:700}
@@ -39,5 +40,6 @@
 .india-post-series-table .admin-state{min-width:0}
 .india-post-office-modal{display:grid;gap:13px}
 .india-post-office-modal>p{margin:0 0 3px;color:var(--admin-muted);font-size:12px;line-height:1.5}
+.india-post-office-lookup{display:flex;align-items:flex-end;gap:8px;min-width:0}.india-post-office-lookup .india-post-series-field{flex:1;min-width:0}.india-post-office-lookup .admin-button{flex:none;min-height:38px}.india-post-office-results{grid-column:1/-1}.india-post-office-results select{box-sizing:border-box;width:100%;min-height:38px;border:1px solid var(--admin-line);border-radius:7px;background:#fff;color:var(--admin-ink);padding:9px;font:12px Inter,sans-serif}.india-post-office-results small{color:var(--admin-muted);font-size:10px}
 @media(max-width:1050px){.india-post-series-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.india-post-series-form,.india-post-series-list{padding:15px}.india-post-series-grid{grid-template-columns:1fr}.india-post-series-form-footer{align-items:stretch;flex-direction:column}.india-post-series-form-footer .admin-button{width:100%}.india-post-series-section-title{align-items:flex-start}.india-post-series-list-heading h3{font-size:16px}}

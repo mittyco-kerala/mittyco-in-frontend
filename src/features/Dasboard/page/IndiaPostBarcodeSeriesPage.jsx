@@ -6,6 +6,7 @@ import {
     createIndiaPostBarcodeSeries,
     getErrorMessage,
     listIndiaPostBarcodeSeries,
+    searchIndiaPostOffices,
     unwrapList,
     updateIndiaPostBarcodeSeries,
 } from "../services/adminApi";
@@ -51,6 +52,8 @@ export default function IndiaPostBarcodeSeriesPage() {
     const [officeEditor, setOfficeEditor] = useState(null);
     const [officeForm, setOfficeForm] = useState({ booking_office_id: "", booking_office_name: "", dropoff_pincode: "" });
     const [savingOffice, setSavingOffice] = useState(false);
+    const [officeSearchBusy, setOfficeSearchBusy] = useState(false);
+    const [offices, setOffices] = useState([]);
 
     const loadSeries = useCallback(async () => {
         setLoading(true);
@@ -109,6 +112,7 @@ export default function IndiaPostBarcodeSeriesPage() {
     };
 
     const openOfficeEditor = (series) => {
+        setOffices([]);
         setOfficeEditor(series);
         setOfficeForm({
             booking_office_id: series.booking_office_id || "",
@@ -132,6 +136,42 @@ export default function IndiaPostBarcodeSeriesPage() {
             setSavingOffice(false);
         }
     };
+
+    const searchOffices = async (pincode) => {
+        if (!/^\d{6}$/.test(String(pincode || ""))) {
+            toast.error("Enter a 6-digit drop-off PIN code first.");
+            return;
+        }
+        setOfficeSearchBusy(true);
+        setOffices([]);
+        try {
+            const response = await searchIndiaPostOffices(pincode);
+            const found = response.data?.offices || [];
+            setOffices(found);
+            if (!found.length) toast.error("India Post found no eligible booking offices for that PIN.");
+        } catch (requestError) {
+            toast.error(getErrorMessage(requestError, "Could not search India Post offices."));
+        } finally {
+            setOfficeSearchBusy(false);
+        }
+    };
+
+    const selectOffice = (office, target) => {
+        const values = {
+            booking_office_id: office.office_id,
+            booking_office_name: office.office_name,
+            dropoff_pincode: office.pincode,
+        };
+        if (target === "series") setForm((current) => ({ ...current, ...values }));
+        else setOfficeForm((current) => ({ ...current, ...values }));
+        setOffices([]);
+    };
+
+    const firstSerial = /^\d{1,8}$/.test(form.first_number) ? Number(form.first_number) : null;
+    const lastSerial = /^\d{1,8}$/.test(form.last_number) ? Number(form.last_number) : null;
+    const proposedBarcodeCount = firstSerial !== null && lastSerial !== null && lastSerial >= firstSerial
+        ? lastSerial - firstSerial + 1
+        : 0;
 
     return <section className="admin-page india-post-series-page">
         <PageHeader
@@ -162,10 +202,11 @@ export default function IndiaPostBarcodeSeriesPage() {
                 <div className="india-post-series-grid">
                     <TextField label="DOP booking office ID" name="booking_office_id" value={form.booking_office_id} onChange={handleChange} placeholder="8 digits" inputMode="numeric" pattern="[0-9]{8}" maxLength={8} />
                     <TextField label="Booking office name" name="booking_office_name" value={form.booking_office_name} onChange={handleChange} placeholder="As shown by India Post" maxLength={100} />
-                    <TextField label="Drop-off PIN code" name="dropoff_pincode" value={form.dropoff_pincode} onChange={handleChange} placeholder="6 digits" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} />
+                    <div className="india-post-office-lookup"><TextField label="Drop-off PIN code" name="dropoff_pincode" value={form.dropoff_pincode} onChange={handleChange} placeholder="6 digits" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} /><button type="button" className="admin-button secondary" onClick={() => searchOffices(form.dropoff_pincode)} disabled={officeSearchBusy}>{officeSearchBusy ? "Searching..." : "Find offices"}</button></div>
+                    {offices.length > 0 && <label className="india-post-series-field india-post-office-results"><span>Choose the DOP-approved booking office</span><select defaultValue="" onChange={(event) => { const office = offices.find((item) => item.office_id === event.target.value); if (office) selectOffice(office, "series"); }}><option value="">Select an office</option>{offices.map((office) => <option key={office.office_id} value={office.office_id}>{office.office_name} · {office.office_type_code} · ID {office.office_id}</option>)}</select><small>Search results are from India Post. Select only the office approved for your contract/drop-off.</small></label>}
                 </div>
             </details>
-            <div className="india-post-series-form-footer"><span>Service: <strong>Business Parcel (BP)</strong></span><button type="submit" className="admin-button primary" disabled={saving}>{saving ? "Saving..." : <><FiPlus aria-hidden="true" /> Save series</>}</button></div>
+            <div className="india-post-series-form-footer"><div><span>Service: <strong>Business Parcel (BP)</strong></span>{proposedBarcodeCount > 0 && <small className={proposedBarcodeCount === 1 ? "is-single-range" : ""}>{proposedBarcodeCount.toLocaleString("en-IN")} barcode{proposedBarcodeCount === 1 ? "" : "s"} · {s10Barcode(form.barcode_prefix, firstSerial)} to {s10Barcode(form.barcode_prefix, lastSerial)}. Check this against the DOP allocation before saving.</small>}</div><button type="submit" className="admin-button primary" disabled={saving}>{saving ? "Saving..." : <><FiPlus aria-hidden="true" /> Save series</>}</button></div>
         </form>
 
         <section className="admin-panel india-post-series-list" aria-labelledby="india-post-series-heading">
@@ -196,7 +237,8 @@ export default function IndiaPostBarcodeSeriesPage() {
                 <p>These details are not needed to save a barcode range. Enter the DOP-approved office details before booking a shipment.</p>
                 <label className="india-post-series-field"><span>DOP booking office ID</span><input value={officeForm.booking_office_id} onChange={(event) => setOfficeForm((current) => ({ ...current, booking_office_id: event.target.value }))} inputMode="numeric" pattern="[0-9]{8}" maxLength={8} required /></label>
                 <label className="india-post-series-field"><span>Booking office name</span><input value={officeForm.booking_office_name} onChange={(event) => setOfficeForm((current) => ({ ...current, booking_office_name: event.target.value }))} maxLength={100} required /></label>
-                <label className="india-post-series-field"><span>Drop-off PIN code</span><input value={officeForm.dropoff_pincode} onChange={(event) => setOfficeForm((current) => ({ ...current, dropoff_pincode: event.target.value }))} inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required /></label>
+                <div className="india-post-office-lookup"><label className="india-post-series-field"><span>Drop-off PIN code</span><input value={officeForm.dropoff_pincode} onChange={(event) => setOfficeForm((current) => ({ ...current, dropoff_pincode: event.target.value.replace(/\D/g, "").slice(0, 6) }))} inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required /></label><button type="button" className="admin-button secondary" onClick={() => searchOffices(officeForm.dropoff_pincode)} disabled={officeSearchBusy}>{officeSearchBusy ? "Searching..." : "Find offices"}</button></div>
+                {offices.length > 0 && <label className="india-post-series-field india-post-office-results"><span>Choose the DOP-approved booking office</span><select defaultValue="" onChange={(event) => { const office = offices.find((item) => item.office_id === event.target.value); if (office) selectOffice(office, "edit"); }}><option value="">Select an office</option>{offices.map((office) => <option key={office.office_id} value={office.office_id}>{office.office_name} · {office.office_type_code} · ID {office.office_id}</option>)}</select><small>Search results are from India Post. Select only the office approved for your contract/drop-off.</small></label>}
                 <div className="admin-modal-actions"><button type="button" className="admin-button secondary" onClick={() => setOfficeEditor(null)} disabled={savingOffice}>Cancel</button><button type="submit" className="admin-button primary" disabled={savingOffice}>{savingOffice ? "Saving..." : "Save office details"}</button></div>
             </form>
         </Modal>}

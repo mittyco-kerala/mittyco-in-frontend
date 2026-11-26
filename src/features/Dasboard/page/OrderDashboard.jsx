@@ -6,7 +6,7 @@ import { ConfirmDialog, DataTable, DebouncedSearch, EmptyState, ErrorState, Filt
 import useAdminResource from "../hooks/useAdminResource";
 import OverviewGraphs from "../components/OverviewGraphs";
 import useFormErrors from "../hooks/useFormErrors";
-import { assignProdinentBarcode, bookIndiaPostShipment, bookProdinentShipment, createResource, deleteResource, downloadIndiaPostLabel, downloadProdinentLabel, duplicateResource, getErrorMessage, getFieldSchema, getOrderDetails, getResource, listResource, refreshIndiaPostTracking, refreshProdinentTracking, syncProdinentOrder, unwrapList, updateOrderDetails, updateResource } from "../services/adminApi";
+import { bookIndiaPostShipment, createResource, deleteResource, downloadIndiaPostLabel, duplicateResource, getErrorMessage, getFieldSchema, getOrderDetails, getResource, listResource, refreshIndiaPostTracking, unwrapList, updateOrderDetails, updateResource } from "../services/adminApi";
 import ProductView from "./ProductView";
 import ProductEditor from "./ProductEditor";
 import HeroBannerEditor from "./HeroBannerEditor";
@@ -19,6 +19,7 @@ import WelcomeBonusPage from "./WelcomeBonusPage";
 import OfferEditor from "./OfferEditor";
 import TokenBlacklistPage from "./TokenBlacklistPage";
 import IndiaPostBarcodeSeriesPage from "./IndiaPostBarcodeSeriesPage";
+import IndiaPostSettingsPage from "./IndiaPostSettingsPage";
 import navbarLogo from "../../../assets/mittyco/mittyco-logo-transparent-dark.png";
 import { getImageUrl } from "../../../utils/imageUrl";
 import { logoutSession } from "../../../lib/ApiClient";
@@ -48,9 +49,10 @@ const resources = {
     carts: { label: "Carts", group: "Customers", fields: ["user", "variant", "variant_unit", "quantity", "coupon"], columns: ["user", "variant", "variant_unit", "quantity"] },
     addresses: { label: "Addresses", group: "Customers", fields: ["user", "full_name", "phone", "address_line", "city", "postal_code", "country", "is_default"], columns: ["user", "full_name", "phone", "city", "postal_code", "is_default"] },
     "user-profiles": { label: "User Profiles", group: "Customers", fields: ["user", "phone", "date_of_birth", "gender"], columns: ["user", "phone", "date_of_birth", "gender"] },
-    orders: { label: "Orders", group: "Orders", fields: ["user", "address", "customer_name", "subtotal", "discount_amount", "shipping_charge", "total_amount", "payment_status", "status", "prodinent_status", "prodinent_article_id", "created_at"], columns: ["customer_name", "total_amount", "payment_status", "status", "fulfillment_provider", "prodinent_status", "prodinent_article_id", "india_post_booking_status", "india_post_barcode", "created_at"] },
+    orders: { label: "Orders", group: "Orders", fields: ["user", "address", "customer_name", "subtotal", "discount_amount", "shipping_charge", "total_amount", "payment_status", "status", "fulfillment_provider", "india_post_booking_status", "india_post_barcode", "created_at"], columns: ["customer_name", "total_amount", "payment_status", "status", "fulfillment_provider", "india_post_booking_status", "india_post_barcode", "created_at"] },
     "order-items": { label: "Order Items", group: "Orders", fields: ["order", "product", "color", "unit", "quantity", "original_price", "variant_unit", "discount_amount", "price", "total_price"], columns: ["order", "product", "quantity", "price", "total_price"] },
     "india-post-barcode-series": { label: "India Post Barcodes", group: "Orders", fields: [], columns: [] },
+    "india-post-settings": { label: "India Post Settings", group: "Orders", fields: [], columns: [] },
     "hero-banners": { label: "Hero Banners", group: "Marketing", fields: ["subtitle", "title", "description", "image", "button_text", "display_order", "is_active"], columns: ["subtitle", "title", "button_text", "display_order", "is_active"] },
     "promo-banners": { label: "Promotional Banners", group: "Marketing", fields: ["image", "link", "is_active"], columns: ["image", "link", "is_active"] },
     "hero-side-banners": { label: "Hero Side Banners", group: "Marketing", fields: ["image", "link", "is_active"], columns: ["image", "link", "is_active"] },
@@ -64,7 +66,7 @@ const resources = {
 
 const navGroups = [
     { title: "Workspace", items: [{ key: "overview", label: "Overview", icon: FiGrid }] },
-    { title: "Orders", items: [{ key: "orders", label: "Orders", icon: FiShoppingBag }, { key: "order-items", label: "Order Items", icon: FiClipboard }, { key: "india-post-barcode-series", label: "India Post Barcodes", icon: FiTag }] },
+    { title: "Orders", items: [{ key: "orders", label: "Orders", icon: FiShoppingBag }, { key: "order-items", label: "Order Items", icon: FiClipboard }, { key: "india-post-barcode-series", label: "India Post Barcodes", icon: FiTag }, { key: "india-post-settings", label: "India Post Settings", icon: FiSettings }] },
     { title: "Catalog", items: ["categories", "subcategories", "brands", "products", "colors", "unit-types", "units", "offers"].map((key) => ({ key, label: key === "products" ? "Products & Variants" : resources[key].label, icon: key === "products" ? FiPackage : FiLayers })) },
     { title: "Customers", items: ["users", "user-profiles", "addresses", "wishlists", "carts"].map((key) => ({ key, label: resources[key].label, icon: key === "users" ? FiUsers : FiArchive })) },
     { title: "Dashboard", items: ["coupons", "welcome-bonuses"].map((key) => ({ key, label: resources[key].label, icon: FiTag })) },
@@ -353,7 +355,7 @@ export default function OrderDashboard() {
             <div className="admin-sidebar-footer"><div className="admin-user"><span>{(getAuthValue("first_name") || "S").slice(0, 1).toUpperCase()}</span><div><strong>{getAuthValue("first_name") || "Super Admin"}</strong><small>Super Admin</small></div></div><button className="admin-nav-item admin-logout-button" onClick={logout}><FiLogOut /><span>Sign out</span></button></div>
         </aside>
         {sidebarOpen && <button className="admin-scrim" onClick={() => setSidebarOpen(false)} aria-label="Close menu" />}
-        <main className="admin-content"><header className="admin-topbar"><button type="button" className="admin-menu" onClick={() => setSidebarOpen(true)} aria-label="Open navigation"><FiMenu /></button><div><p className="admin-eyebrow">SUPER ADMIN / {currentTitle.toUpperCase()}</p><h1>{currentTitle}</h1></div><div className="admin-top-actions"><button type="button" className={`admin-button secondary refresh-action ${refreshing ? "is-refreshing" : ""}`} onClick={refreshDashboard} disabled={refreshing} aria-label="Refresh dashboard"><FiRefreshCw aria-hidden="true" /> <span>{refreshing ? "Refreshing..." : "Refresh"}</span></button><FiActivity className="admin-live" title="Live admin workspace" aria-label="Live admin workspace" /></div></header>{forbidden && <div className="admin-access-alert" role="alert"><FiSettings /><span><strong>Super Admin access required</strong><small>Your account does not have permission to access this resource.</small></span><button type="button" onClick={() => setForbidden(false)} aria-label="Dismiss access alert"><FiX /></button></div>}{isProductEditor ? <ProductEditor /> : isProductView ? <ProductView /> : isOfferEditor ? <OfferEditor /> : isHeroBannerEditor ? <HeroBannerEditor schema={schema} /> : isPromoBannerEditor ? <PromoBannerEditor /> : isHeroSideBannerEditor ? <HeroSideBannerEditor /> : isCouponEditor ? <CouponEditor /> : isCouponUsageEditor ? <CouponUsageEditor /> : isWelcomeBonusEditor ? <WelcomeBonusEditor /> : isTrustBenefitEditor || isProductHighlightEditor || isProductMessageEditor ? <ResourceEditorPage resource={pathKey} id={isEditRoute ? detailId : undefined} schema={schema} /> : isWelcomeBonusView ? <WelcomeBonusPage /> : isOrderEditor ? <OrderEditPage id={detailId} /> : detailId && pathKey === "orders" ? <OrderDetail id={detailId} /> : isGenericEditPage ? <ResourceEditorPage resource={pathKey} id={detailId} schema={schema} /> : isReadOnlyResourceView ? <ReadOnlyResourcePage resource={pathKey} id={detailId} schema={schema} /> : pathKey === "india-post-barcode-series" ? <IndiaPostBarcodeSeriesPage /> : pathKey === "overview" ? <Overview data={overview} loading={overviewLoading} /> : pathKey === "welcome-bonuses" ? <WelcomeBonusPage /> : pathKey === "token-blacklist/outstanding-tokens" ? <TokenBlacklistPage type="outstanding" /> : pathKey === "token-blacklist/blacklisted-tokens" ? <TokenBlacklistPage type="blacklisted" /> : resources[pathKey] ? <ResourcePage key={pathKey} resource={pathKey} schema={schema} /> : <Overview data={overview} loading={overviewLoading} />}</main>
+        <main className="admin-content"><header className="admin-topbar"><button type="button" className="admin-menu" onClick={() => setSidebarOpen(true)} aria-label="Open navigation"><FiMenu /></button><div><p className="admin-eyebrow">SUPER ADMIN / {currentTitle.toUpperCase()}</p><h1>{currentTitle}</h1></div><div className="admin-top-actions"><button type="button" className={`admin-button secondary refresh-action ${refreshing ? "is-refreshing" : ""}`} onClick={refreshDashboard} disabled={refreshing} aria-label="Refresh dashboard"><FiRefreshCw aria-hidden="true" /> <span>{refreshing ? "Refreshing..." : "Refresh"}</span></button><FiActivity className="admin-live" title="Live admin workspace" aria-label="Live admin workspace" /></div></header>{forbidden && <div className="admin-access-alert" role="alert"><FiSettings /><span><strong>Super Admin access required</strong><small>Your account does not have permission to access this resource.</small></span><button type="button" onClick={() => setForbidden(false)} aria-label="Dismiss access alert"><FiX /></button></div>}{isProductEditor ? <ProductEditor /> : isProductView ? <ProductView /> : isOfferEditor ? <OfferEditor /> : isHeroBannerEditor ? <HeroBannerEditor schema={schema} /> : isPromoBannerEditor ? <PromoBannerEditor /> : isHeroSideBannerEditor ? <HeroSideBannerEditor /> : isCouponEditor ? <CouponEditor /> : isCouponUsageEditor ? <CouponUsageEditor /> : isWelcomeBonusEditor ? <WelcomeBonusEditor /> : isTrustBenefitEditor || isProductHighlightEditor || isProductMessageEditor ? <ResourceEditorPage resource={pathKey} id={isEditRoute ? detailId : undefined} schema={schema} /> : isWelcomeBonusView ? <WelcomeBonusPage /> : isOrderEditor ? <OrderEditPage id={detailId} /> : detailId && pathKey === "orders" ? <OrderDetail id={detailId} /> : isGenericEditPage ? <ResourceEditorPage resource={pathKey} id={detailId} schema={schema} /> : isReadOnlyResourceView ? <ReadOnlyResourcePage resource={pathKey} id={detailId} schema={schema} /> : pathKey === "india-post-barcode-series" ? <IndiaPostBarcodeSeriesPage /> : pathKey === "india-post-settings" ? <IndiaPostSettingsPage /> : pathKey === "overview" ? <Overview data={overview} loading={overviewLoading} /> : pathKey === "welcome-bonuses" ? <WelcomeBonusPage /> : pathKey === "token-blacklist/outstanding-tokens" ? <TokenBlacklistPage type="outstanding" /> : pathKey === "token-blacklist/blacklisted-tokens" ? <TokenBlacklistPage type="blacklisted" /> : resources[pathKey] ? <ResourcePage key={pathKey} resource={pathKey} schema={schema} /> : <Overview data={overview} loading={overviewLoading} />}</main>
     </div>;
 }
 
@@ -933,9 +935,7 @@ function OrderDetailContent({ order, id, navigate }) {
         setShipmentAction("label");
         setShipmentError("");
         try {
-            const response = await (currentOrder.fulfillment_provider === "india_post"
-                ? downloadIndiaPostLabel(currentOrder.id)
-                : downloadProdinentLabel(currentOrder.id));
+            const response = await downloadIndiaPostLabel(currentOrder.id);
             const blob = response.data instanceof Blob
                 ? response.data
                 : new Blob([response.data], { type: "application/pdf" });
@@ -957,11 +957,6 @@ function OrderDetailContent({ order, id, navigate }) {
         }
     };
     const providerStatus = currentOrder.prodinent_status || "Not synced";
-    const canSync = !currentOrder.prodinent_order_id && currentOrder.payment_status === "Paid";
-    const canAssign = Boolean(currentOrder.prodinent_order_id) && !currentOrder.prodinent_article_id;
-    const canBook = Boolean(currentOrder.prodinent_order_id)
-        && !["Manifested", "Delivered", "Cancelled"].includes(currentOrder.prodinent_status);
-    const canLabel = Boolean(currentOrder.prodinent_order_id && (currentOrder.prodinent_article_id || currentOrder.prodinent_label_available));
     const isIndiaPost = currentOrder.fulfillment_provider === "india_post";
     const indiaPostStatus = currentOrder.india_post_booking_status || "Not booked";
     const indiaPostQuote = currentOrder.shipping_quote && typeof currentOrder.shipping_quote === "object"
@@ -1007,21 +1002,13 @@ function OrderDetailContent({ order, id, navigate }) {
                 {indiaPostStatus === "Needs review" && <p className="admin-muted">Booking result is uncertain. Check this barcode with India Post before retrying to avoid a duplicate shipment.</p>}
             </div>
         </section> : <section className="admin-panel prodinent-shipment-panel" aria-labelledby="prodinent-shipment-heading">
-            <div className="admin-panel-heading"><div><h3 id="prodinent-shipment-heading">Post Office shipment</h3><p>Barcode, booking, label, and tracking are managed through Prodinent.</p></div><FiTruck /></div>
+            <div className="admin-panel-heading"><div><h3 id="prodinent-shipment-heading">Historical Prodinent record</h3><p>Existing provider data is retained for reference. Configure new-order routing in India Post Settings.</p></div><FiTruck /></div>
             <div className="prodinent-shipment-body">
                 <div className="prodinent-shipment-grid">
                     <div><small>Provider status</small><strong>{providerStatus}</strong></div>
                     <div><small>Prodinent order</small><strong>{currentOrder.prodinent_order_id || "Not created"}</strong></div>
                     <div><small>Article / barcode</small><strong>{currentOrder.prodinent_article_id || "Not assigned"}</strong></div>
                     <div><small>Tracking</small>{currentOrder.prodinent_tracking_link ? <a href={currentOrder.prodinent_tracking_link} target="_blank" rel="noreferrer">Open tracking</a> : <strong>Not available</strong>}</div>
-                </div>
-                {shipmentError && <p className="admin-form-error" role="alert">{shipmentError}</p>}
-                <div className="prodinent-shipment-actions">
-                    {canSync && <button type="button" className="admin-button secondary" onClick={() => runShipmentAction("sync", syncProdinentOrder, "Order synced to Prodinent")} disabled={Boolean(shipmentAction)}><FiRefreshCw /> {shipmentAction === "sync" ? "Syncing..." : "Sync order"}</button>}
-                    {canAssign && <button type="button" className="admin-button secondary" onClick={() => runShipmentAction("barcode", assignProdinentBarcode, "Barcode assigned")} disabled={Boolean(shipmentAction)}><FiTag /> {shipmentAction === "barcode" ? "Assigning..." : "Assign barcode"}</button>}
-                    {canBook && <button type="button" className="admin-button primary" onClick={() => runShipmentAction("book", bookProdinentShipment, "Shipment booked")} disabled={Boolean(shipmentAction)}><FiTruck /> {shipmentAction === "book" ? "Booking..." : "Book shipment"}</button>}
-                    {canLabel && <button type="button" className="admin-button secondary" onClick={downloadLabel} disabled={Boolean(shipmentAction)}><FiDownload /> {shipmentAction === "label" ? "Preparing..." : "Download label"}</button>}
-                    {currentOrder.prodinent_order_id && <button type="button" className="admin-button secondary" onClick={() => runShipmentAction("track", refreshProdinentTracking, "Tracking refreshed")} disabled={Boolean(shipmentAction)}><FiRefreshCw /> {shipmentAction === "track" ? "Refreshing..." : "Refresh tracking"}</button>}
                 </div>
             </div>
         </section>}

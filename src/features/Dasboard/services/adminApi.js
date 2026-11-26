@@ -35,6 +35,21 @@ export const createIndiaPostBarcodeSeries = (data) =>
 export const updateIndiaPostBarcodeSeries = (id, data) =>
     updateResource("india-post-barcode-series", id, data);
 
+export const getIndiaPostSettings = () =>
+    client.get(`${ADMIN_BASE}/india-post-settings/`);
+
+export const updateIndiaPostSettings = (data) =>
+    client.patch(`${ADMIN_BASE}/india-post-settings/`, data);
+
+export const testIndiaPostConnection = () =>
+    client.post(`${ADMIN_BASE}/india-post-settings/test-connection/`);
+
+export const testIndiaPostTariff = (data) =>
+    client.post(`${ADMIN_BASE}/india-post-settings/test-tariff/`, data);
+
+export const searchIndiaPostOffices = (pincode) =>
+    client.get(`${ADMIN_BASE}/india-post-settings/post-offices/`, { params: { pincode } });
+
 export const toggleWelcomeBonusActive = (id) =>
     client.post(`${resourceUrl("welcome-bonuses", id)}toggle-active/`);
 
