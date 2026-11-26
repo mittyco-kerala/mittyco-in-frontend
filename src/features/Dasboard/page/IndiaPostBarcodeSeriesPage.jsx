@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { FiArchive, FiCheckCircle, FiPlus, FiRefreshCw, FiShield, FiTag } from "react-icons/fi";
-import { EmptyState, ErrorState, LoadingState, PageHeader } from "../components/AdminPrimitives";
+import { FiArchive, FiCheckCircle, FiEdit2, FiPlus, FiRefreshCw, FiShield, FiTag } from "react-icons/fi";
+import { EmptyState, ErrorState, LoadingState, Modal, PageHeader } from "../components/AdminPrimitives";
 import {
     createIndiaPostBarcodeSeries,
     getErrorMessage,
@@ -39,6 +39,9 @@ export default function IndiaPostBarcodeSeriesPage() {
     const [saving, setSaving] = useState(false);
     const [busyId, setBusyId] = useState(null);
     const [form, setForm] = useState(initialForm);
+    const [officeEditor, setOfficeEditor] = useState(null);
+    const [officeForm, setOfficeForm] = useState({ booking_office_id: "", booking_office_name: "", dropoff_pincode: "" });
+    const [savingOffice, setSavingOffice] = useState(false);
 
     const loadSeries = useCallback(async () => {
         setLoading(true);
@@ -96,6 +99,31 @@ export default function IndiaPostBarcodeSeriesPage() {
         }
     };
 
+    const openOfficeEditor = (series) => {
+        setOfficeEditor(series);
+        setOfficeForm({
+            booking_office_id: series.booking_office_id || "",
+            booking_office_name: series.booking_office_name || "",
+            dropoff_pincode: series.dropoff_pincode || "",
+        });
+    };
+
+    const saveOfficeDetails = async (event) => {
+        event.preventDefault();
+        if (!officeEditor) return;
+        setSavingOffice(true);
+        try {
+            await updateIndiaPostBarcodeSeries(officeEditor.id, officeForm);
+            toast.success("Booking office details saved. Barcode allocation is unchanged.");
+            setOfficeEditor(null);
+            await loadSeries();
+        } catch (requestError) {
+            toast.error(getErrorMessage(requestError, "Could not save booking office details."));
+        } finally {
+            setSavingOffice(false);
+        }
+    };
+
     return <section className="admin-page india-post-series-page">
         <PageHeader
             eyebrow="SHIPMENTS / INDIA POST"
@@ -119,10 +147,15 @@ export default function IndiaPostBarcodeSeriesPage() {
                 <TextField label="Barcode prefix" name="barcode_prefix" value={form.barcode_prefix} onChange={handleChange} placeholder="e.g. CX" pattern="[A-Z]{2}" maxLength={2} required hint="The two letters printed on the DOP allocated series." />
                 <TextField label="First serial number" name="first_number" value={form.first_number} onChange={handleChange} placeholder="9 digits" inputMode="numeric" pattern="[0-9]{9}" maxLength={9} required hint="First number in the allocated block, without prefix or IN." />
                 <TextField label="Last serial number" name="last_number" value={form.last_number} onChange={handleChange} placeholder="9 digits" inputMode="numeric" pattern="[0-9]{9}" maxLength={9} required hint="Inclusive last number in the approved block." />
-                <TextField label="DOP booking office ID" name="booking_office_id" value={form.booking_office_id} onChange={handleChange} placeholder="8 digits" inputMode="numeric" pattern="[0-9]{8}" maxLength={8} required />
-                <TextField label="Booking office name" name="booking_office_name" value={form.booking_office_name} onChange={handleChange} placeholder="As shown by India Post" maxLength={100} required />
-                <TextField label="Drop-off PIN code" name="dropoff_pincode" value={form.dropoff_pincode} onChange={handleChange} placeholder="6 digits" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required />
             </div>
+            <details className="india-post-series-optional-office">
+                <summary>Booking office details <span>Optional now; required before booking shipments</span></summary>
+                <div className="india-post-series-grid">
+                    <TextField label="DOP booking office ID" name="booking_office_id" value={form.booking_office_id} onChange={handleChange} placeholder="8 digits" inputMode="numeric" pattern="[0-9]{8}" maxLength={8} />
+                    <TextField label="Booking office name" name="booking_office_name" value={form.booking_office_name} onChange={handleChange} placeholder="As shown by India Post" maxLength={100} />
+                    <TextField label="Drop-off PIN code" name="dropoff_pincode" value={form.dropoff_pincode} onChange={handleChange} placeholder="6 digits" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} />
+                </div>
+            </details>
             <div className="india-post-series-form-footer"><span>Service: <strong>Business Parcel (BP)</strong></span><button type="submit" className="admin-button primary" disabled={saving}>{saving ? "Saving..." : <><FiPlus aria-hidden="true" /> Save series</>}</button></div>
         </form>
 
@@ -137,14 +170,26 @@ export default function IndiaPostBarcodeSeriesPage() {
                         <td><code>{series.barcode_prefix}{serial(series.allocation_start)}IN – {series.barcode_prefix}{serial(series.last_number)}IN</code></td>
                         <td>{exhausted ? "Exhausted" : <code>{series.barcode_prefix}{serial(series.next_number)}IN</code>}</td>
                         <td>{Number(series.remaining_count).toLocaleString("en-IN")}</td>
-                        <td><strong>{series.booking_office_name}</strong><small>ID {series.booking_office_id} · PIN {series.dropoff_pincode}</small></td>
+                        <td>{series.booking_office_name ? <><strong>{series.booking_office_name}</strong><small>ID {series.booking_office_id} · PIN {series.dropoff_pincode}</small></> : <><strong>Not set</strong><small>Add before shipment booking</small></>}</td>
                         <td><span className={`india-post-series-status ${series.is_active && !exhausted ? "active" : "paused"}`}>{exhausted ? "Exhausted" : series.is_active ? "Active" : "Paused"}</span></td>
-                        <td><button type="button" className={`admin-button ${series.is_active ? "secondary" : "primary"}`} onClick={() => void toggleActive(series)} disabled={busyId === series.id || exhausted}>
-                            {series.is_active ? <><FiArchive aria-hidden="true" /> Pause</> : <><FiCheckCircle aria-hidden="true" /> Activate</>}
-                        </button></td>
+                        <td><div className="india-post-series-actions">
+                            <button type="button" className="admin-button secondary" onClick={() => openOfficeEditor(series)}><FiEdit2 aria-hidden="true" /> Office</button>
+                            <button type="button" className={`admin-button ${series.is_active ? "secondary" : "primary"}`} onClick={() => void toggleActive(series)} disabled={busyId === series.id || exhausted}>
+                                {series.is_active ? <><FiArchive aria-hidden="true" /> Pause</> : <><FiCheckCircle aria-hidden="true" /> Activate</>}
+                            </button>
+                        </div></td>
                     </tr>;
                 })}</tbody>
             </table></div>}
         </section>
+        {officeEditor && <Modal title="Booking office details" onClose={() => !savingOffice && setOfficeEditor(null)}>
+            <form className="india-post-office-modal" onSubmit={saveOfficeDetails}>
+                <p>These details are not needed to save a barcode range. Enter the DOP-approved office details before booking a shipment.</p>
+                <label className="india-post-series-field"><span>DOP booking office ID</span><input value={officeForm.booking_office_id} onChange={(event) => setOfficeForm((current) => ({ ...current, booking_office_id: event.target.value }))} inputMode="numeric" pattern="[0-9]{8}" maxLength={8} required /></label>
+                <label className="india-post-series-field"><span>Booking office name</span><input value={officeForm.booking_office_name} onChange={(event) => setOfficeForm((current) => ({ ...current, booking_office_name: event.target.value }))} maxLength={100} required /></label>
+                <label className="india-post-series-field"><span>Drop-off PIN code</span><input value={officeForm.dropoff_pincode} onChange={(event) => setOfficeForm((current) => ({ ...current, dropoff_pincode: event.target.value }))} inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required /></label>
+                <div className="admin-modal-actions"><button type="button" className="admin-button secondary" onClick={() => setOfficeEditor(null)} disabled={savingOffice}>Cancel</button><button type="submit" className="admin-button primary" disabled={savingOffice}>{savingOffice ? "Saving..." : "Save office details"}</button></div>
+            </form>
+        </Modal>}
     </section>;
 }
